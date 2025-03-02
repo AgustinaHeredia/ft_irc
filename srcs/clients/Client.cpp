@@ -6,7 +6,7 @@
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:37 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/02 12:07:51 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/02 15:47:17 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,6 +67,10 @@ std::string Client::getUsername() const {
 
 bool Client::isAuthenticated() const {
     return authenticated;
+}
+
+void Client::authenticate() {
+    authenticated = true;
 }
 
 void Client::setNickname(const std::string& nick) {

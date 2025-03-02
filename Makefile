@@ -7,11 +7,15 @@ INC_DIR = srcs/utils
 
 SRC = $(SRC_DIR)/main.cpp \
 	$(SRC_DIR)/server/Server.cpp \
+	$(SRC_DIR)/server/ClientManager.cpp \
+	$(SRC_DIR)/server/ChannelManager.cpp \
 	$(SRC_DIR)/channel/Channel.cpp \
 	$(SRC_DIR)/clients/Client.cpp \
 	$(SRC_DIR)/comands/CommandHandler.cpp \
 	$(SRC_DIR)/comands/NICK.cpp \
-	$(SRC_DIR)/comands/USER.cpp
+	$(SRC_DIR)/comands/USER.cpp \
+	$(SRC_DIR)/comands/PRIVMSG.cpp \
+	$(SRC_DIR)/comands/JOIN.cpp
 
 OBJ = $(SRC:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 DEP = $(OBJ:.o=.d)

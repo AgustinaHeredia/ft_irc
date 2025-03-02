@@ -6,7 +6,7 @@
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:09 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/02 13:53:41 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/02 19:30:47 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,9 +27,11 @@ public:
     CommandHandler(Server& server);
     void handleCommand(Client& client, const std::string& command);
 
-};
+	void handleNickCommand(Server& server, Client& client, const std::string& nick);
+	void handleUserCommand(Client& client, const std::string& user);
+	void handlePrivmsg(Server& server, Client& client, const std::string& message);
+	void handleJoin(Server& server, Client& client, const std::string& message);
 
-void handleNickCommand(Server& server, Client& client, const std::string& nick);
-void handleUserCommand(Client& client, const std::string& user);
+};
 
 #endif

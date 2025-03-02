@@ -1,35 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Channel.hpp                                        :+:      :+:    :+:   */
+/*   ChannelManager.hpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/02/04 19:12:22 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/02 14:55:24 by agusheredia      ###   ########.fr       */
+/*   Created: 2025/03/02 18:21:30 by agusheredia       #+#    #+#             */
+/*   Updated: 2025/03/02 19:36:18 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-//representará un canal IRC
+#ifndef CHANNEL_MANAGER_HPP
+# define CHANNEL_MANAGER_HPP
 
-#ifndef CHANNEL_HPP
-#define CHANNEL_HPP
+# include <vector>
+#include "../channel/Channel.hpp"
 
-#include <string>
-#include <vector>
-#include "../clients/Client.hpp"
-
-class Channel {
-	public:
-		Channel(const std::string& name);
-		void addClient(Client& client);
-		void removeClient(Client& client);
-		void broadcast(const std::string& message);
-		std::string getName() const;
-
+class ChannelManager {
 	private:
-		std::string name;
-		std::vector<Client*> clients;
+		std::vector<Channel> channels;
+	public:
+		void addChannel(const Channel& channel);
+		void removeChannel(const std::string& channelName);
+		Channel* getChannelByName(const std::string& name);
+	
 };
 
 #endif

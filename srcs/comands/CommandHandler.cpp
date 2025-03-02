@@ -6,12 +6,13 @@
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:14 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/02 13:54:09 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/02 19:18:11 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "CommandHandler.hpp"
 #include "../server/Server.hpp"
+#include "../server/ClientManager.hpp"
 #include <iostream>
 #include <sstream>
 
@@ -32,7 +33,15 @@ void CommandHandler::handleCommand(Client& client, const std::string& command) {
         handleUserCommand(client, user);
     } else if (cmd == "QUIT") {
         std::cout << "Comando QUIT recibido" << std::endl;
-        server.removeClient(&client);
+        server.getClientManager().removeClient(&client);
+    } else if (cmd == "PRIVMSG") {
+        std::string message;
+        std::getline(iss, message);
+        handlePrivmsg(server, client, message);
+    } else if (cmd == "JOIN") {
+        std::string message;
+        std::getline(iss, message);
+        handleJoin(server, client, message);
     } else {
         std::cout << "Comando desconocido" << std::endl;
     }
