@@ -1,0 +1,39 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   CommandHandler.cpp                                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/02/04 19:12:14 by agusheredia       #+#    #+#             */
+/*   Updated: 2025/03/02 13:54:09 by agusheredia      ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "CommandHandler.hpp"
+#include "../server/Server.hpp"
+#include <iostream>
+#include <sstream>
+
+CommandHandler::CommandHandler(Server& server) : server(server) {}
+
+void CommandHandler::handleCommand(Client& client, const std::string& command) {
+    std::istringstream iss(command);
+    std::string cmd;
+    iss >> cmd;
+
+    if (cmd == "NICK") {
+        std::string nick;
+        iss >> nick;
+        handleNickCommand(server, client, nick);
+    } else if (cmd == "USER") {
+        std::string user;
+        iss >> user;
+        handleUserCommand(client, user);
+    } else if (cmd == "QUIT") {
+        std::cout << "Comando QUIT recibido" << std::endl;
+        server.removeClient(&client);
+    } else {
+        std::cout << "Comando desconocido" << std::endl;
+    }
+}
