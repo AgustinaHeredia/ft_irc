@@ -6,7 +6,7 @@
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:14 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/02 19:18:11 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/06 21:20:44 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,8 @@
 CommandHandler::CommandHandler(Server& server) : server(server) {}
 
 void CommandHandler::handleCommand(Client& client, const std::string& command) {
-    std::istringstream iss(command);
+    std::cout << "Manejando comando: " << command << std::endl;
+	std::istringstream iss(command);
     std::string cmd;
     iss >> cmd;
 
@@ -39,9 +40,9 @@ void CommandHandler::handleCommand(Client& client, const std::string& command) {
         std::getline(iss, message);
         handlePrivmsg(server, client, message);
     } else if (cmd == "JOIN") {
-        std::string message;
-        std::getline(iss, message);
-        handleJoin(server, client, message);
+        std::string channel_name;
+        iss >> channel_name;
+        handleJoin(server, client, channel_name);
     } else {
         std::cout << "Comando desconocido" << std::endl;
     }

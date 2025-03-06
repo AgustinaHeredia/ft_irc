@@ -6,7 +6,7 @@
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:22 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/02 14:55:24 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/06 20:41:15 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ class Channel {
 		void removeClient(Client& client);
 		void broadcast(const std::string& message);
 		std::string getName() const;
+		bool isClientInChannel(const Client& client) const;
 
 	private:
 		std::string name;

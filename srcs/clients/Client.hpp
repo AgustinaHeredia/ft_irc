@@ -6,7 +6,7 @@
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:31 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/02 15:46:57 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/05 20:07:57 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,12 +25,11 @@ private:
     int client_fd;
     sockaddr_in client_addr;
     bool connected;
-    pthread_t client_thread;
 	std::string nickname;
     std::string username;
     bool authenticated;
+	std::string partialCommand;
 
-    static void* threadFunc(void* arg);
 public:
     Client(int fd, sockaddr_in addr);
     ~Client();
@@ -46,6 +45,7 @@ public:
     void setNickname(const std::string& nick);
     void setUsername(const std::string& user);
 
+	std::string &getPartialCommand();
 };
 
 #endif

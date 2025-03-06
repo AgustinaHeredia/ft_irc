@@ -6,7 +6,7 @@
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:42 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/02 19:17:59 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/05 21:01:13 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,6 @@ class Server {
 		void start();
 		void stop();
 		void process();
-		void handleCommand(Client& client, const std::string& command);
 		ClientManager& getClientManager(); // Método para obtener el ClientManager
     	ChannelManager& getChannelManager(); // Método para obtener el ChannelManager
 };

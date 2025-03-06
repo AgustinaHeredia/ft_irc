@@ -6,7 +6,7 @@
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 11:59:25 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/02 19:09:34 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/05 20:32:53 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,6 @@ int main(int argc, char** argv) {
             server.process();
         }
 
-        server.stop();
     } catch (const std::exception& e) {
         std::cerr << "Error crítico: " << e.what() << std::endl;
         return 1;

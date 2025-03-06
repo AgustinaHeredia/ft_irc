@@ -6,7 +6,7 @@
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:37 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/02 15:47:17 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/05 20:08:58 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 #include <iostream>
 
 Client::Client(int fd, sockaddr_in addr) : client_fd(fd), client_addr(addr), connected(true) {
-    pthread_create(&client_thread, NULL, &Client::threadFunc, this);
 
 	// Usar client_addr para mostrar la dirección del cliente
     char client_ip[INET_ADDRSTRLEN];
@@ -34,7 +33,6 @@ void Client::start() {
 
 void Client::disconnect() {
     connected = false;
-    pthread_join(client_thread, NULL);
 }
 
 void Client::handleMessages() {
@@ -81,8 +79,6 @@ void Client::setUsername(const std::string& user) {
     username = user;
 }
 
-void* Client::threadFunc(void* arg) {
-    Client* client = static_cast<Client*>(arg);
-    client->handleMessages();
-    return NULL;
+std::string &Client::getPartialCommand() { 
+	return partialCommand;
 }

@@ -6,7 +6,7 @@
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:27 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/02 14:55:57 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/06 20:41:37 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,4 +39,13 @@ void Channel::broadcast(const std::string& message) {
 
 std::string Channel::getName() const {
     return name;
+}
+
+bool Channel::isClientInChannel(const Client& client) const {
+    for (size_t i = 0; i < clients.size(); ++i) {
+        if (clients[i] == &client) { // Comparación de punteros
+            return true;
+        }
+    }
+    return false;
 }
