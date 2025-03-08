@@ -6,7 +6,7 @@
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/02 13:39:53 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/02 20:11:59 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/08 22:25:39 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,7 @@ void CommandHandler::handlePrivmsg(Server& srv, Client& client, const std::strin
             std::cout << "[DEBUG] PRIVMSG dirigido a canal: " << targets[i] << std::endl;
             Channel* channel = srv.getChannelManager().getChannelByName(targets[i]);
             if (channel) {
-                std::string formatted_msg = ":" + client.getNickname() + " PRIVMSG " + targets[i] + " :" + msg + "\n";
+                std::string formatted_msg = targets[i] + ":" + client.getNickname() + " :" + msg + "\n";
                 channel->broadcast(formatted_msg);
                 std::cout << "[DEBUG] Mensaje enviado a canal " << targets[i] << std::endl;
             } else {

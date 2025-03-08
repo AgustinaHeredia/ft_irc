@@ -6,7 +6,7 @@
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:14 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/08 10:30:37 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/08 11:11:13 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,10 @@ void CommandHandler::handleCommand(Client& client, const std::string& command) {
 		std::string channel_name;
         iss >> channel_name;
         handlePart(server, client, channel_name);
+	} else if (cmd == "KICK") {
+        std::string message;
+        std::getline(iss, message);
+        handleKick(server, client, message); 
 	} else {
         std::cout << "Comando desconocido" << std::endl;
     }

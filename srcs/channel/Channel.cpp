@@ -6,7 +6,7 @@
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:27 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/08 10:06:37 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/08 11:12:09 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,4 +52,9 @@ bool Channel::isClientInChannel(const Client& client) const {
 
 bool Channel::isEmpty() const {
     return clients.empty();
+}
+
+bool Channel::isOperator(const Client& client) const {
+    // Suponiendo que el primer usuario en el canal es el operador
+    return !clients.empty() && clients[0] == &client;
 }

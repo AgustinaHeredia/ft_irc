@@ -6,7 +6,7 @@
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:09 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/08 10:32:22 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/08 11:03:40 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,16 +22,17 @@ class Server;
 
 class CommandHandler {
 	private:
-		Server& server;
+		Server &server;
 	public:
-		CommandHandler(Server& server);
-		void handleCommand(Client& client, const std::string& command);
+		CommandHandler(Server &server);
+		void handleCommand(Client &client, const std::string &command);
 
-		void handleNickCommand(Server& server, Client& client, const std::string& nick);
-		void handleUserCommand(Client& client, const std::string& user);
-		void handlePrivmsg(Server& server, Client& client, const std::string& message);
-		void handleJoin(Server& server, Client& client, const std::string &channel_name);
+		void handleNickCommand(Server &srv, Client &client, const std::string &nick);
+		void handleUserCommand(Client &client, const std::string &user);
+		void handlePrivmsg(Server &srv, Client &client, const std::string &message);
+		void handleJoin(Server &srv, Client &client, const std::string &channel_name);
 		void handlePart(Server &srv, Client &client, const std::string &channel_name);
+		void handleKick(Server &srv, Client& client, const std::string &message);
 
 };
 
