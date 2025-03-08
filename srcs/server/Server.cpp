@@ -6,7 +6,7 @@
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:07:11 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/06 20:23:48 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/09 00:03:37 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
 #define BUFFER_SIZE 1024
 #define BACKLOG 10
 
-Server::Server(int port, const std::string& password) : port(port), password(password), commandHandler(*this)
+Server::Server(int port, const std::string &password) : port(port), password(password), commandHandler(*this)
 {}
 
 void Server::start() {
@@ -194,10 +194,10 @@ void Server::acceptClients() {
     commandHandler.handleCommand(client, command);
 }*/
 
-ClientManager& Server::getClientManager() {
+ClientManager &Server::getClientManager() {
     return clientManager;
 }
 
-ChannelManager& Server::getChannelManager() {
+ChannelManager &Server::getChannelManager() {
     return channelManager;
 }

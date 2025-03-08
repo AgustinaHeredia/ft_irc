@@ -6,7 +6,7 @@
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/02 13:39:53 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/08 22:25:39 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/09 00:01:35 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 #include <cstring>
 #include <vector>
 
-void CommandHandler::handlePrivmsg(Server& srv, Client& client, const std::string& message) {
+void CommandHandler::handlePrivmsg(Server &srv, Client &client, const std::string &message) {
     std::cout << "[DEBUG] Recibido PRIVMSG: " << message << std::endl;
 
     // Verificar si el cliente está autenticado

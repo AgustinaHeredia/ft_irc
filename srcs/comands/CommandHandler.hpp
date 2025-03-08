@@ -6,7 +6,7 @@
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:09 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/08 11:03:40 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/09 00:07:35 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,8 @@ class CommandHandler {
 		void handlePrivmsg(Server &srv, Client &client, const std::string &message);
 		void handleJoin(Server &srv, Client &client, const std::string &channel_name);
 		void handlePart(Server &srv, Client &client, const std::string &channel_name);
-		void handleKick(Server &srv, Client& client, const std::string &message);
+		void handleKick(Server &srv, Client &client, const std::string &message);
+		void handleTopic(Server &srv, Client &client, const std::string &message) ;
 
 };
 

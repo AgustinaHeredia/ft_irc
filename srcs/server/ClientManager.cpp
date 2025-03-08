@@ -6,7 +6,7 @@
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/02 18:20:12 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/02 19:38:18 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/09 00:02:46 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,19 +22,19 @@ void ClientManager::removeClient(Client* client){
     delete client;
 }
 
-bool ClientManager::isNicknameInUse(const std::string& nick){
+bool ClientManager::isNicknameInUse(const std::string &nick){
 	return nicknames.find(nick) != nicknames.end();
 }
 
-void ClientManager::addNickname(const std::string& nick, Client* client){
+void ClientManager::addNickname(const std::string &nick, Client* client){
 	nicknames[nick] = client;
 }
 
-void ClientManager::removeNickname(const std::string& nick){
+void ClientManager::removeNickname(const std::string &nick){
 	nicknames.erase(nick);
 }
 
-Client* ClientManager::getClientByNickname(const std::string& nick){
+Client* ClientManager::getClientByNickname(const std::string &nick){
 	std::map<std::string, Client*>::const_iterator it = nicknames.find(nick);
     if (it != nicknames.end()) {
         return it->second;

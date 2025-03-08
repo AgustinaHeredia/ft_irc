@@ -6,7 +6,7 @@
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/02 13:39:17 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/02 19:31:44 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/09 00:01:48 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 #include <cstring>
 #include <sys/socket.h>
 
-void CommandHandler::handleUserCommand(Client& client, const std::string& user) {
+void CommandHandler::handleUserCommand(Client &client, const std::string &user) {
     if (user.empty()) {
         const char* error_msg = "ERROR: Username inválido.\n";
         send(client.getFd(), error_msg, strlen(error_msg), 0);

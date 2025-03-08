@@ -6,7 +6,7 @@
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/02 18:20:02 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/02 19:36:27 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/09 00:03:05 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,10 +25,10 @@ class ClientManager {
 	public:
 		void addClient(Client* client);
 		void removeClient(Client* client);
-		bool isNicknameInUse(const std::string& nick);
-		void addNickname(const std::string& nick, Client* client);
-		void removeNickname(const std::string& nick);
-		Client* getClientByNickname(const std::string& nick);
+		bool isNicknameInUse(const std::string &nick);
+		void addNickname(const std::string &nick, Client* client);
+		void removeNickname(const std::string &nick);
+		Client* getClientByNickname(const std::string &nick);
 		Client* getClientByFd(int fd);
 };
 
