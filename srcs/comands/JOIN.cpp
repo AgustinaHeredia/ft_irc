@@ -6,7 +6,7 @@
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/02 13:40:26 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/06 21:19:55 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/08 10:34:08 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 #include <sstream>
 #include <cstring>
 
-void CommandHandler::handleJoin(Server& srv, Client& client, const std::string& channel_name) {
+void CommandHandler::handleJoin(Server& srv, Client& client, const std::string &channel_name) {
     std::cout << "[DEBUG] Comando JOIN recibido: " << channel_name << std::endl;
     std::cout << "[DEBUG] Nombre del canal extraído: " << channel_name << std::endl;
 

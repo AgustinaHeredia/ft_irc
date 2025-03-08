@@ -6,7 +6,7 @@
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:27 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/06 20:41:37 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/08 10:06:37 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,4 +48,8 @@ bool Channel::isClientInChannel(const Client& client) const {
         }
     }
     return false;
+}
+
+bool Channel::isEmpty() const {
+    return clients.empty();
 }

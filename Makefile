@@ -15,7 +15,8 @@ SRC = $(SRC_DIR)/main.cpp \
 	$(SRC_DIR)/comands/NICK.cpp \
 	$(SRC_DIR)/comands/USER.cpp \
 	$(SRC_DIR)/comands/PRIVMSG.cpp \
-	$(SRC_DIR)/comands/JOIN.cpp
+	$(SRC_DIR)/comands/JOIN.cpp \
+	$(SRC_DIR)/comands/PART.cpp
 
 OBJ = $(SRC:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 DEP = $(OBJ:.o=.d)
