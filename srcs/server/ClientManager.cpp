@@ -6,7 +6,7 @@
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/02 18:20:12 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/09 00:02:46 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/09 21:33:54 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,4 +49,8 @@ Client* ClientManager::getClientByFd(int fd) {
         }
     }
     return nullptr;
+}
+
+std::vector<Client*> ClientManager::getAllClients() const {
+    return clients;
 }

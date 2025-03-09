@@ -6,7 +6,7 @@
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:22 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/09 20:57:18 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/09 21:25:27 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ class Channel {
 	private:
 		std::string name;
 		std::vector<Client*> clients;
+		std::vector<Client*> invitedUsers;
 		std::string topic;
 		std::vector<Client*> operators;
 		bool inviteOnly;   //  `+i`: Canal solo por invitación
@@ -43,7 +44,7 @@ class Channel {
 
 		bool isOperator(const Client &client) const;
 		void addOperator(Client& client);
-		void removeOperator(Client& client);
+		void removeOperator(Client &client);
 
 		void setInviteOnly(bool state);
 		bool isInviteOnly() const;
@@ -51,7 +52,7 @@ class Channel {
 		void setTopicRestricted(bool state);
 		bool isTopicRestricted() const;
 
-		void setKey(const std::string& newKey);
+		void setKey(const std::string &newKey);
 		void removeKey();
 		std::string getKey() const;
 
@@ -59,8 +60,14 @@ class Channel {
 		void removeUserLimit();
 		int getUserLimit() const;
 
-		void setTopic(const std::string& newTopic);
+		void setTopic(const std::string &newTopic);
 		std::string getTopic() const;
+
+		void inviteUser(Client& client);
+		bool isUserInvited(const Client &client) const;
+		void removeInvitedUser(Client &client);
+
+		std::vector<Client*> getClients() const;
 
 };
 

@@ -6,7 +6,7 @@
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:27 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/09 20:57:51 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/09 21:25:48 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,4 +112,22 @@ void Channel::setTopic(const std::string& newTopic) {
 
 std::string Channel::getTopic() const {
     return topic.empty() ? "No hay un tema establecido." : topic;
+}
+
+void Channel::inviteUser(Client& client) {
+    if (!isUserInvited(client)) {
+        invitedUsers.push_back(&client);
+    }
+}
+
+bool Channel::isUserInvited(const Client& client) const {
+    return std::find(invitedUsers.begin(), invitedUsers.end(), &client) != invitedUsers.end();
+}
+
+void Channel::removeInvitedUser(Client& client) {
+    invitedUsers.erase(std::remove(invitedUsers.begin(), invitedUsers.end(), &client), invitedUsers.end());
+}
+
+std::vector<Client*> Channel::getClients() const {
+    return clients;
 }

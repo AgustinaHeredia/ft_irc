@@ -6,7 +6,7 @@
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/02 13:40:26 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/09 20:15:55 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/09 21:21:25 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,4 +61,10 @@ void CommandHandler::handleJoin(Server &srv, Client &client, const std::string &
     // Notificar al canal que el cliente se unió
     std::string join_msg = ":" + client.getNickname() + " JOIN " + channel_name + "\n";
     channel->broadcast(join_msg);
+
+	if (channel->isInviteOnly() && !channel->isUserInvited(client)) {
+		send(client.getFd(), "ERROR: Este canal es solo por invitación.\n", 40, 0);
+		return;
+	}
+	channel->removeInvitedUser(client);
 }
