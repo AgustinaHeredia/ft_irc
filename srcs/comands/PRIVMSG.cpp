@@ -6,7 +6,7 @@
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/02 13:39:53 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/09 00:01:35 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/09 20:23:19 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,8 @@ void CommandHandler::handlePrivmsg(Server &srv, Client &client, const std::strin
 
     // Verificar si el cliente está autenticado
     if (!client.isAuthenticated()) {
-        send(client.getFd(), "ERROR: No autenticado.\n", 24, 0);
+        const char* error_msg = "ERROR: No autenticado.\n";
+		send(client.getFd(), error_msg, strlen(error_msg), 0);
         std::cout << "[DEBUG] Cliente no autenticado, rechazando PRIVMSG" << std::endl;
         return;
     }
@@ -37,8 +38,9 @@ void CommandHandler::handlePrivmsg(Server &srv, Client &client, const std::strin
 
     // Verificar si el destinatario está vacío
     if (target.empty()) {
-        send(client.getFd(), "ERROR: Uso incorrecto de PRIVMSG en target.\n", 44, 0);
-        std::cout << "[DEBUG] Error: Target vacío en PRIVMSG" << std::endl;
+        const char* error_msg = "ERROR: Uso incorrecto de PRIVMSG en target.\n";
+        send(client.getFd(), error_msg, strlen(error_msg), 0);
+		std::cout << "[DEBUG] Error: Target vacío en PRIVMSG" << std::endl;
         return;
     }
 
@@ -50,8 +52,9 @@ void CommandHandler::handlePrivmsg(Server &srv, Client &client, const std::strin
 
     // Verificar si el mensaje está vacío
     if (msg.empty()) {
-        send(client.getFd(), "ERROR: Uso incorrecto de PRIVMSG. Mensaje vacío.\n", 50, 0);
-        std::cout << "[DEBUG] Error: Mensaje vacío en PRIVMSG" << std::endl;
+        const char* error_msg = "ERROR: Uso incorrecto de PRIVMSG. Mensaje vacío.\n";
+        send(client.getFd(), error_msg, strlen(error_msg), 0);
+		std::cout << "[DEBUG] Error: Mensaje vacío en PRIVMSG" << std::endl;
         return;
     }
 
@@ -74,8 +77,9 @@ void CommandHandler::handlePrivmsg(Server &srv, Client &client, const std::strin
                 channel->broadcast(formatted_msg);
                 std::cout << "[DEBUG] Mensaje enviado a canal " << targets[i] << std::endl;
             } else {
-                send(client.getFd(), "ERROR: Canal no encontrado.\n", 28, 0);
-                std::cout << "[DEBUG] Error: Canal no encontrado -> " << targets[i] << std::endl;
+                const char* error_msg ="ERROR: Canal no encontrado.\n";
+                send(client.getFd(), error_msg, strlen(error_msg), 0);
+				std::cout << "[DEBUG] Error: Canal no encontrado -> " << targets[i] << std::endl;
             }
         } else {
             std::cout << "[DEBUG] PRIVMSG dirigido a usuario: " << targets[i] << std::endl;
@@ -93,12 +97,14 @@ void CommandHandler::handlePrivmsg(Server &srv, Client &client, const std::strin
                     send(recipient->getFd(), formatted_msg.c_str(), formatted_msg.size(), 0);
                     std::cout << "[DEBUG] Mensaje enviado a usuario " << targets[i] << std::endl;
                 } else {
-                    send(client.getFd(), "ERROR: No se puede enviar mensaje en este momento.\n", 50, 0);
-                    std::cout << "[DEBUG] Error: No se pudo enviar mensaje a " << targets[i] << std::endl;
+                    const char* error_msg = "ERROR: No se puede enviar mensaje en este momento.\n";
+                    send(client.getFd(), error_msg, strlen(error_msg), 0);
+					std::cout << "[DEBUG] Error: No se pudo enviar mensaje a " << targets[i] << std::endl;
                 }
             } else {
-                send(client.getFd(), "ERROR: Nickname no encontrado.\n", 30, 0);
-                std::cout << "[DEBUG] Error: Nickname no encontrado -> " << targets[i] << std::endl;
+                const char* error_msg = "ERROR: Nickname no encontrado.\n";
+                send(client.getFd(), error_msg, strlen(error_msg), 0);
+				std::cout << "[DEBUG] Error: Nickname no encontrado -> " << targets[i] << std::endl;
             }
         }
     }

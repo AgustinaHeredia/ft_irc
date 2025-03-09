@@ -6,7 +6,7 @@
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/02 13:40:26 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/09 00:00:27 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/09 20:15:55 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,14 +23,16 @@ void CommandHandler::handleJoin(Server &srv, Client &client, const std::string &
 
     // Verificar si el cliente está autenticado antes de unirse a un canal
     if (!client.isAuthenticated()) {
-        send(client.getFd(), "ERROR: Debes autenticarte antes de unirte a un canal.\n", 50, 0);
-        std::cout << "[DEBUG] Cliente no autenticado intentó unirse a " << channel_name << std::endl;
+        const char* error_msg = "ERROR: Debes autenticarte antes de unirte a un canal.\n";
+        send(client.getFd(), error_msg, strlen(error_msg), 0);
+		std::cout << "[DEBUG] Cliente no autenticado intentó unirse a " << channel_name << std::endl;
         return;
     }
 
     // Verificar si el nombre del canal es válido
     if (channel_name.empty() || channel_name[0] != '#') {
-        send(client.getFd(), "ERROR: Nombre de canal inválido. Debe comenzar con '#'.\n", 55, 0);
+		const char* error_msg = "ERROR: Nombre de canal inválido. Debe comenzar con '#'.\n";
+        send(client.getFd(), error_msg, strlen(error_msg), 0);
         std::cout << "[DEBUG] Error: Nombre de canal inválido -> " << channel_name << std::endl;
         return;
     }
@@ -46,8 +48,9 @@ void CommandHandler::handleJoin(Server &srv, Client &client, const std::string &
 
     // Verificar si el cliente ya está en el canal
     if (channel->isClientInChannel(client)) {
-        send(client.getFd(), "ERROR: Ya estás en este canal.\n", 30, 0);
-        std::cout << "[DEBUG] Cliente " << client.getNickname() << " ya está en " << channel_name << std::endl;
+		const char* error_msg = "ERROR: Ya estás en este canal.\n";
+		send(client.getFd(), error_msg, strlen(error_msg), 0);
+		std::cout << "[DEBUG] Cliente " << client.getNickname() << " ya está en " << channel_name << std::endl;
         return;
     }
 

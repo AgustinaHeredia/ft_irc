@@ -6,7 +6,7 @@
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/02 13:38:59 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/09 00:01:06 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/09 20:20:09 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,13 +19,15 @@
 
 void CommandHandler::handleNickCommand(Server &srv, Client &client, const std::string &nick) {
     if (nick.empty()) {
-        send(client.getFd(), "ERROR: Nickname inválido.\n", 25, 0);
-        return;
+        const char* error_msg = "ERROR: Nickname inválido.\n";
+        send(client.getFd(), error_msg, strlen(error_msg), 0);
+		return;
     }
 
     if (server.getClientManager().isNicknameInUse(nick)) {
-        send(client.getFd(), "ERROR: Nickname en uso.\n", 25, 0);
-        return;
+        const char* error_msg =  "ERROR: Nickname en uso.\n";
+        send(client.getFd(), error_msg, strlen(error_msg), 0);
+		return;
     }
 
     if (!client.getNickname().empty()) {

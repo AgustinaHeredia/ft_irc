@@ -6,7 +6,7 @@
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:07:11 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/09 00:03:37 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/09 20:00:33 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -189,10 +189,6 @@ void Server::acceptClients() {
     std::string welcome_msg = "Bienvenido al servidor IRC!\n";
     send(client_fd, welcome_msg.c_str(), welcome_msg.size(), 0);
 }
-
-/*void Server::handleCommand(Client& client, const std::string& command) {
-    commandHandler.handleCommand(client, command);
-}*/
 
 ClientManager &Server::getClientManager() {
     return clientManager;

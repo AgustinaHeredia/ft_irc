@@ -6,7 +6,7 @@
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:14 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/09 00:07:59 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/09 19:54:52 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,11 +51,15 @@ void CommandHandler::handleCommand(Client& client, const std::string& command) {
         std::string message;
         std::getline(iss, message);
         handleKick(server, client, message); 
-	} else if (cmd == "TOPIC") { // 🔹 Agregamos TOPIC
+	} else if (cmd == "TOPIC") { 
         std::string message;
         std::getline(iss, message);
         handleTopic(server, client, message);
-    } else {
+    } else if (cmd == "MODE") { 
+        std::string message;
+        std::getline(iss, message);
+        handleMode(server, client, message); 
+	} else {
         std::cout << "Comando desconocido" << std::endl;
     }
 }
