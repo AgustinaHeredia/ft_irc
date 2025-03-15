@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/02 18:20:12 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/15 10:46:57 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/03/15 12:24:08 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,4 +53,11 @@ Client* ClientManager::getClientByFd(int fd) {
 
 std::vector<Client*> ClientManager::getAllClients() const {
     return clients;
+}
+
+void ClientManager::clearAllClients() {
+    for (std::vector<Client*>::iterator it = clients.begin(); it != clients.end(); ++it) {
+        delete *it;  // Liberar el cliente
+    }
+    clients.clear();
 }

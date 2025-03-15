@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/02 18:20:02 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/15 10:49:11 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/03/15 12:24:13 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ class ClientManager {
 		Client* getClientByNickname(const std::string &nick);
 		Client* getClientByFd(int fd);
 		std::vector<Client*> getAllClients() const;
+		void clearAllClients();
 };
 
 #endif

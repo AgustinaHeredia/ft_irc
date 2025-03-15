@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:07:11 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/15 10:45:58 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/03/15 12:30:27 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -147,11 +147,14 @@ Server::~Server() {
 
 void Server::stop() {
     std::cout << "Deteniendo el servidor..." << std::endl;
-    close(server_fd);
+
+    clientManager.clearAllClients();
+    
+    close(server_fd);  // Cerrar el descriptor del servidor
     for (size_t i = 0; i < fds.size(); ++i) {
-        close(fds[i].fd);
+        close(fds[i].fd);  // Cerrar los descriptores de cliente
     }
-    fds.clear();
+    fds.clear();  // Limpiar el vector de fds
 }
 
 void Server::acceptClients() {
