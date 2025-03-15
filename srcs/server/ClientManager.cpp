@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ClientManager.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
+/*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/02 18:20:12 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/09 21:33:54 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/15 10:46:57 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ Client* ClientManager::getClientByNickname(const std::string &nick){
     if (it != nicknames.end()) {
         return it->second;
     }
-    return nullptr;
+    return NULL;
 }
 
 Client* ClientManager::getClientByFd(int fd) {
@@ -48,7 +48,7 @@ Client* ClientManager::getClientByFd(int fd) {
             return *it;  // Devolvemos el puntero al cliente
         }
     }
-    return nullptr;
+    return NULL;
 }
 
 std::vector<Client*> ClientManager::getAllClients() const {

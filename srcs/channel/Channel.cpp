@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
+/*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:27 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/09 21:25:48 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/15 10:50:00 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,8 @@
 #include <cstring>
 #include <sys/socket.h>
 
-Channel::Channel(const std::string &name)
-    : name(name), inviteOnly(false), topicRestricted(false), userLimit(0) {}
+Channel::Channel(const std::string &canal)
+    : name(canal), inviteOnly(false), topicRestricted(false), userLimit(0) {}
 
 Channel::~Channel() {}
 

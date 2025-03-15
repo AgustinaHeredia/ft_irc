@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ChannelManager.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
+/*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/02 18:21:47 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/09 00:02:04 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/15 10:46:57 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,5 +31,5 @@ Channel* ChannelManager::getChannelByName(const std::string &name) {
             return &channels[i];
         }
     }
-    return nullptr;
+    return NULL;
 }

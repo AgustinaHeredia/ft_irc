@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   MODE.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
+/*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/09 19:14:17 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/09 20:52:34 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/15 10:52:44 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,7 @@ void CommandHandler::handleMode(Server &srv, Client &client, const std::string &
         channel->removeKey();
         channel->broadcast(":" + client.getNickname() + " MODE " + channel_name + " -k\n");
     } else if (mode == "+l") {
-        channel->setUserLimit(std::stoi(param));
+        channel->setUserLimit(std::atoi(param.c_str()));
         channel->broadcast(":" + client.getNickname() + " MODE " + channel_name + " +l " + param + "\n");
     } else if (mode == "-l") {
         channel->removeUserLimit();

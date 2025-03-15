@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
+/*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:07:11 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/09 20:00:33 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/15 10:45:58 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
 #define BUFFER_SIZE 1024
 #define BACKLOG 10
 
-Server::Server(int port, const std::string &password) : port(port), password(password), commandHandler(*this)
+Server::Server(int puerto, const std::string &pwd) : port(puerto), password(pwd), commandHandler(*this)
 {}
 
 void Server::start() {

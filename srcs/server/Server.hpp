@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
+/*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:42 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/09 00:04:03 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/15 10:44:45 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 # define SERVER_HPP
 
 # include <vector>
+# include <cerrno>
 # include <map>
 # include <poll.h>  // Necesario para manejar poll()
 # include "../clients/Client.hpp"
