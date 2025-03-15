@@ -6,7 +6,7 @@
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:37 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/08 23:59:28 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/15 18:23:31 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@ Client::Client(int fd, sockaddr_in addr) : client_fd(fd), client_addr(addr), con
 	// Usar client_addr para mostrar la dirección del cliente
     char client_ip[INET_ADDRSTRLEN];
     inet_ntop(AF_INET, &(client_addr.sin_addr), client_ip, INET_ADDRSTRLEN);
+	connected = true;
     std::cout << "Cliente conectado desde " << client_ip << ":" << ntohs(client_addr.sin_port) << std::endl;
 }
 
@@ -27,8 +28,11 @@ Client::~Client() {
     }
 }
 
-void Client::start() {
-    // Implementación de la función start
+bool Client::isConnected() {
+	if ((client_fd != -1)) {
+		connected = true;
+	}
+    return connected; 
 }
 
 void Client::disconnect() {
@@ -45,9 +49,6 @@ void Client::handleMessages() {
             break;
         }
         std::string command(buffer);
-        // Aquí se puede llamar a CommandHandler para manejar el comando
-        // Por ejemplo:
-        // commandHandler.handleCommand(*this, command);
 	}
 }
 
@@ -68,7 +69,9 @@ bool Client::isAuthenticated() const {
 }
 
 void Client::authenticate() {
-    authenticated = true;
+    if (!nickname.empty() && !username.empty()) {
+        authenticated = true;
+    }
 }
 
 void Client::setNickname(const std::string &nick) {

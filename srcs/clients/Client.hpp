@@ -6,7 +6,7 @@
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:31 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/08 23:59:00 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/15 18:23:28 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,8 +33,8 @@ private:
 public:
     Client(int fd, sockaddr_in addr);
     ~Client();
-    void start();
     void disconnect();
+	bool isConnected();
     void handleMessages();
     int getFd() const;
 	std::string getNickname() const;

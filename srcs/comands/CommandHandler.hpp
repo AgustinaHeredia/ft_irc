@@ -6,7 +6,7 @@
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:09 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/09 21:30:00 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/15 18:04:03 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,8 @@ class CommandHandler {
 		void handleTopic(Server &srv, Client &client, const std::string &message);
 		void handleMode(Server& srv, Client &client, const std::string &message);
 		void handleInvite(Server& srv, Client& client, const std::string& message);
-		void handleWho(Server& srv, Client& client, const std::string& message);
+		void handleWho(Server &srv, Client &client, const std::string& message);
+		void handleNotice(Server &srv, Client &client, const std::string &message);
 
 };
 

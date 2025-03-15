@@ -6,7 +6,7 @@
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/02 13:39:17 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/09 00:01:48 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/15 17:26:55 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,9 +24,14 @@ void CommandHandler::handleUserCommand(Client &client, const std::string &user) 
         return;
     }
 
-    client.setUsername(user);
-	client.authenticate();
-    const char* success_msg = "Autenticación completa.\n";
-    send(client.getFd(), success_msg, strlen(success_msg), 0);
-    std::cout << "Username establecido a: " << user << " para el cliente: " << client.getFd() << std::endl;
+	client.setUsername(user);
+    client.authenticate();
+
+    if (client.isAuthenticated()) {
+        const char* success_msg = "Autenticación completa.\n";
+        send(client.getFd(), success_msg, strlen(success_msg), 0);
+    } else {
+        const char* warning_msg = "Warning: Falta el NICK para completar la autenticación.\n";
+        send(client.getFd(), warning_msg, strlen(warning_msg), 0);
+    }
 }

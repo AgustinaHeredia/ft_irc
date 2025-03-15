@@ -21,7 +21,8 @@ SRC = $(SRC_DIR)/main.cpp \
 	$(SRC_DIR)/comands/TOPIC.cpp \
 	$(SRC_DIR)/comands/MODE.cpp \
 	$(SRC_DIR)/comands/INVITE.cpp \
-	$(SRC_DIR)/comands/WHO.cpp 
+	$(SRC_DIR)/comands/WHO.cpp \
+	$(SRC_DIR)/comands/NOTICE.cpp
 
 OBJ = $(SRC:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 DEP = $(OBJ:.o=.d)
