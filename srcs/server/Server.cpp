@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
+/*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:07:11 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/15 12:30:27 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/03/16 19:09:49 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -178,11 +178,41 @@ void Server::acceptClients() {
               << inet_ntoa(client_addr.sin_addr) << ":" 
               << ntohs(client_addr.sin_port) << std::endl;
 
+    //  Pedir la contraseña al cliente
+    std::string password_prompt = "Ingrese la contraseña del servidor:\n";
+    send(client_fd, password_prompt.c_str(), password_prompt.size(), 0);
+
+    char buffer[256];
+    memset(buffer, 0, sizeof(buffer));
+    ssize_t bytes_received = recv(client_fd, buffer, sizeof(buffer) - 1, 0);
+    
+    if (bytes_received <= 0) {
+        std::cerr << "Error al recibir la contraseña del cliente." << std::endl;
+        close(client_fd);
+        return;
+    }
+
+    //  Eliminar caracteres de nueva línea
+    std::string received_password(buffer);
+    received_password.erase(received_password.find_last_not_of("\r\n") + 1);
+
+    //  Verificar la contraseña
+    if (received_password != password) {
+        std::cerr << "Conexión rechazada: contraseña incorrecta." << std::endl;
+        std::string error_msg = "ERROR: Contraseña incorrecta. Conexión cerrada.\n";
+        send(client_fd, error_msg.c_str(), error_msg.size(), 0);
+        close(client_fd);
+        return;
+    }
+
+    //  Si la contraseña es correcta, continuar con la conexión
+    std::cout << "Cliente autenticado correctamente." << std::endl;
+
     //  Agregar cliente a `poll()`
     pollfd client_pollfd;
-	client_pollfd.fd = client_fd;
-	client_pollfd.events = POLLIN;  // Solo escuchar lectura al inicio
-	fds.push_back(client_pollfd);
+    client_pollfd.fd = client_fd;
+    client_pollfd.events = POLLIN;  // Solo escuchar lectura al inicio
+    fds.push_back(client_pollfd);
 
     //  Crear y almacenar el nuevo cliente
     Client* new_client = new Client(client_fd, client_addr);
@@ -192,6 +222,7 @@ void Server::acceptClients() {
     std::string welcome_msg = "Bienvenido al servidor IRC!\n";
     send(client_fd, welcome_msg.c_str(), welcome_msg.size(), 0);
 }
+
 
 ClientManager &Server::getClientManager() {
     return clientManager;
