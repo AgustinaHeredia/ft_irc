@@ -6,7 +6,7 @@
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/09 00:05:34 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/09 00:16:44 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/16 19:21:47 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,13 @@ void CommandHandler::handleTopic(Server &srv, Client &client, const std::string 
 
     std::cout << "[DEBUG] Comando TOPIC recibido: " << message << std::endl;
     std::cout << "[DEBUG] Canal: " << channel_name << ", Nuevo tema: " << topic << std::endl;
+
+	if (!client.isAuthenticated()) {
+        const char* error_msg = "Warning: Falta completar la autenticación.\n";
+        send(client.getFd(), error_msg, strlen(error_msg), 0);
+		std::cout << "[DEBUG] Cliente no autenticado intentó TOPIC " << std::endl;
+        return;
+    }
 
     //  Verificar si el canal es válido
     if (channel_name.empty() || channel_name[0] != '#') {

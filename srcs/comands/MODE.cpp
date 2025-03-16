@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   MODE.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
+/*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/09 19:14:17 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/15 10:52:44 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/03/16 19:20:47 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,13 @@ void CommandHandler::handleMode(Server &srv, Client &client, const std::string &
 
     std::cout << "[DEBUG] Comando MODE recibido: " << message << std::endl;
     std::cout << "[DEBUG] Canal: " << channel_name << ", Modo: " << mode << ", Parametro: " << param << std::endl;
+
+	if (!client.isAuthenticated()) {
+        const char* error_msg = "Warning: Falta completar la autenticación.\n";
+        send(client.getFd(), error_msg, strlen(error_msg), 0);
+		std::cout << "[DEBUG] Cliente no autenticado intentó MODE " << std::endl;
+        return;
+    }
 
     //  Verificar si el canal es válido
     if (channel_name.empty() || channel_name[0] != '#') {

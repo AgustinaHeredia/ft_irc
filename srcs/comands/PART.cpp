@@ -6,7 +6,7 @@
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/02 13:40:36 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/08 10:37:16 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/16 19:21:17 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,13 @@ void CommandHandler::handlePart(Server &srv, Client &client, const std::string &
     if (channel_name.empty() || channel_name[0] != '#') {
         const char* error_msg = "ERROR: Nombre de canal inválido. Debe comenzar con '#'.\n";
         send(client.getFd(), error_msg, strlen(error_msg), 0);
+        return;
+    }
+
+	if (!client.isAuthenticated()) {
+        const char* error_msg = "Warning: Falta completar la autenticación.\n";
+        send(client.getFd(), error_msg, strlen(error_msg), 0);
+		std::cout << "[DEBUG] Cliente no autenticado intentó PART " << std::endl;
         return;
     }
 

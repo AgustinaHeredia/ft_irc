@@ -6,7 +6,7 @@
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/09 21:26:06 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/15 18:13:49 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/16 19:22:06 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,13 @@ void CommandHandler::handleWho(Server& srv, Client& client, const std::string& m
     iss >> command >> channel_name;
 
     std::cout << "[DEBUG] Comando WHO recibido: " << message << std::endl;
+
+	if (!client.isAuthenticated()) {
+        const char* error_msg = "Warning: Falta completar la autenticación.\n";
+        send(client.getFd(), error_msg, strlen(error_msg), 0);
+		std::cout << "[DEBUG] Cliente no autenticado intentó WHO " << std::endl;
+        return;
+    }
 
     if (channel_name.empty()) { 
         //  Si no se especifica canal, listar todos los usuarios conectados en el servidor
