@@ -6,7 +6,7 @@
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/09 21:26:06 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/16 19:22:06 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/17 19:49:43 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,11 +19,12 @@
 
 void CommandHandler::handleWho(Server& srv, Client& client, const std::string& message) {
     std::istringstream iss(message);
-    std::string command, channel_name;
-    iss >> command >> channel_name;
+    std::string channel_name;
+    iss >> channel_name;
 
     std::cout << "[DEBUG] Comando WHO recibido: " << message << std::endl;
 
+    //  Verificar autenticación del usuario
 	if (!client.isAuthenticated()) {
         const char* error_msg = "Warning: Falta completar la autenticación.\n";
         send(client.getFd(), error_msg, strlen(error_msg), 0);
@@ -31,12 +32,11 @@ void CommandHandler::handleWho(Server& srv, Client& client, const std::string& m
         return;
     }
 
+    //  WHO sin canal → Listar todos los usuarios del servidor
     if (channel_name.empty()) { 
-        //  Si no se especifica canal, listar todos los usuarios conectados en el servidor
         std::string response = "Usuarios conectados:\n";
         std::vector<Client*> clients = srv.getClientManager().getAllClients();
         for (size_t i = 0; i < clients.size(); ++i) {
-            // Verificar si el cliente está conectado antes de agregarlo a la lista
             if (clients[i]->isConnected()) {
                 response += clients[i]->getNickname() + "\n";
             }
@@ -45,7 +45,13 @@ void CommandHandler::handleWho(Server& srv, Client& client, const std::string& m
         return;
     }
 
-    // Buscar el canal
+    //  Buscar el canal
+    if (channel_name[0] != '#') {
+        const char* error_msg = "ERROR: Nombre de canal inválido.\n";
+        send(client.getFd(), error_msg, strlen(error_msg), 0);
+        return;
+    }
+
     Channel* channel = srv.getChannelManager().getChannelByName(channel_name);
     if (!channel) {
         const char* error_msg = "ERROR: Canal no encontrado.\n";
@@ -53,18 +59,18 @@ void CommandHandler::handleWho(Server& srv, Client& client, const std::string& m
         return;
     }
 
-    // Si el canal es privado (`+i`), solo los miembros pueden ver la lista
+    //  Validar si el canal es privado y el usuario no es miembro
     if (channel->isInviteOnly() && !channel->isClientInChannel(client)) {
         const char* error_msg = "ERROR: No tienes permiso para ver la lista de este canal.\n";
         send(client.getFd(), error_msg, strlen(error_msg), 0);
         return;
     }
 
-    // Obtener y enviar la lista de usuarios del canal
+    //  Obtener la lista de usuarios del canal
     std::string response = "Usuarios en " + channel_name + ":\n";
     std::vector<Client*> clientsInChannel = channel->getClients();
     for (size_t i = 0; i < clientsInChannel.size(); ++i) {
-        if (clientsInChannel[i]->isConnected()) {  // Solo agregar clientes conectados
+        if (clientsInChannel[i]->isConnected()) { 
             response += clientsInChannel[i]->getNickname();
             if (channel->isOperator(*clientsInChannel[i])) {
                 response += " (Operador)";
