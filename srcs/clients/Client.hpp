@@ -6,7 +6,7 @@
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:31 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/15 18:23:28 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/17 20:15:53 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ private:
     bool connected;
 	std::string nickname;
     std::string username;
+	std::string realname;
     bool authenticated;
 	std::string partialCommand;
 
@@ -44,6 +45,9 @@ public:
 
     void setNickname(const std::string &nick);
     void setUsername(const std::string &user);
+
+	std::string getRealname() const;
+	void setRealname(const std::string &name);
 
 	std::string &getPartialCommand();
 };

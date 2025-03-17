@@ -6,7 +6,7 @@
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:14 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/15 18:02:22 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/17 20:42:39 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ void CommandHandler::handleCommand(Client& client, const std::string& command) {
         handleNickCommand(server, client, nick);
     } else if (cmd == "USER") {
         std::string user;
-        iss >> user;
+        std::getline(iss, user);
         handleUserCommand(client, user);
     } else if (cmd == "QUIT") {
         std::cout << "Comando QUIT recibido" << std::endl;

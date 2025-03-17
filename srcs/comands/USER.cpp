@@ -6,7 +6,7 @@
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/02 13:39:17 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/15 17:26:55 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/17 20:37:55 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,16 +15,32 @@
 #include "../clients/Client.hpp"
 #include <iostream>
 #include <cstring>
+#include <sstream>
 #include <sys/socket.h>
 
-void CommandHandler::handleUserCommand(Client &client, const std::string &user) {
-    if (user.empty()) {
-        const char* error_msg = "ERROR: Username inválido.\n";
+void CommandHandler::handleUserCommand(Client &client, const std::string &message) {
+    std::istringstream iss(message);
+    std::string username, hostname, servername, realname;
+    
+    iss >> username >> hostname >> servername; // Leer los primeros 4 parámetros
+
+    std::getline(iss >> std::ws, realname);
+
+    std::cout << "[DEBUG] USER recibido - Username: " << username 
+              << ", Hostname: " << hostname 
+              << ", Servername: " << servername 
+              << ", Realname: " << realname << std::endl;
+
+    // Validaciones
+    if (username.empty() || realname.empty()) {
+        const char* error_msg = "ERROR: Formato incorrecto de USER.\n";
         send(client.getFd(), error_msg, strlen(error_msg), 0);
         return;
     }
 
-	client.setUsername(user);
+    // Asignar valores al cliente
+    client.setUsername(username);
+    client.setRealname(realname);
     client.authenticate();
 
     if (client.isAuthenticated()) {
