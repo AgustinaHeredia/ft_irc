@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CommandHandler.hpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
+/*   By: patri <patri@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:09 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/15 18:04:03 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/18 11:29:16 by patri            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,9 @@ class Server;
 class CommandHandler {
 	private:
 		Server &server;
+		void		botSendResponse(Client& client, const std::string& msg);
+		void		botRPSLogic(Client& client, const std::string& user_choice);
+		std::string	botGenerateRPSChoice();
 	public:
 		CommandHandler(Server &server);
 		void handleCommand(Client &client, const std::string &command);
@@ -38,7 +41,7 @@ class CommandHandler {
 		void handleInvite(Server& srv, Client& client, const std::string& message);
 		void handleWho(Server &srv, Client &client, const std::string& message);
 		void handleNotice(Server &srv, Client &client, const std::string &message);
-
+		void handleBot(Client &client, const std::string &message);
 };
 
 #endif

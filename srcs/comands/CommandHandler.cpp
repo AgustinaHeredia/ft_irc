@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CommandHandler.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
+/*   By: patri <patri@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:14 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/17 20:42:39 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/18 11:29:09 by patri            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,10 @@ void CommandHandler::handleCommand(Client& client, const std::string& command) {
         std::string message;
         std::getline(iss, message);
         handlePrivmsg(server, client, message);
+    } else if (cmd == "!bot") {
+        std::string message;
+        std::getline(iss, message);
+        handleBot(client, message);
     } else {
         std::cout << "Comando desconocido" << std::endl;
 		const char* warning_msg = "Warning: Comando desconocido.\n";

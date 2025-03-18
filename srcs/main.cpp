@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
+/*   By: patri <patri@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 11:59:25 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/05 20:32:53 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/18 11:27:11 by patri            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 #include "server/Server.hpp"
 #include <iostream>
 #include <csignal>
+#include <ctime>
+#include <cstdlib>
 
 
 bool g_shutdown = false;
@@ -35,6 +37,7 @@ int main(int argc, char** argv) {
         std::cerr << "Error: Puerto inválido. Debe estar entre 1 y 65535." << std::endl;
         return 1;
     }
+    srand(time(NULL));
 
     std::string password = argv[2];
 
