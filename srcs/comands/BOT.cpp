@@ -6,7 +6,7 @@
 /*   By: patri <patri@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/02 13:40:26 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/18 11:43:37 by patri            ###   ########.fr       */
+/*   Updated: 2025/03/18 11:54:15 by patri            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,16 +33,16 @@ void CommandHandler::handleBot(Client &client, const std::string &message)
     }
 
     std::istringstream iss(message);
-    std::string subcomando;
-    iss >> subcomando;
+    std::string subcommand;
+    iss >> subcommand;
 
     // Piedra, Papel o Tijera
-    if (subcomando == "rps") 
+    if (subcommand == "rps") 
     {
-        std::string jugada_usuario;
-        iss >> jugada_usuario;
+        std::string user_move;
+        iss >> user_move;
 
-        if (jugada_usuario.empty()) 
+        if (user_move.empty()) 
         {
             const char* error_msg = "ERROR: Debes especificar tu jugada (piedra, papel o tijera).\n";
             send(client.getFd(), error_msg, strlen(error_msg), 0);
@@ -50,10 +50,10 @@ void CommandHandler::handleBot(Client &client, const std::string &message)
         }
 
         // Convertir la jugada del usuario a minúsculas
-        std::transform(jugada_usuario.begin(), jugada_usuario.end(), jugada_usuario.begin(), ::tolower);
+        std::transform(user_move.begin(), user_move.end(), user_move.begin(), ::tolower);
 
         // Validar la jugada
-        if (jugada_usuario != "piedra" && jugada_usuario != "papel" && jugada_usuario != "tijera") 
+        if (user_move != "piedra" && user_move != "papel" && user_move != "tijera") 
         {
             const char* error_msg = "ERROR: Jugada inválida. Usa 'piedra', 'papel' o 'tijera'.\n";
             send(client.getFd(), error_msg, strlen(error_msg), 0);
@@ -61,30 +61,30 @@ void CommandHandler::handleBot(Client &client, const std::string &message)
         }
 
         // Generar la jugada del bot (0: piedra, 1: papel, 2: tijera)
-        std::string opciones[3] = { "piedra", "papel", "tijera" };
-        std::string jugada_bot_str = opciones[rand() % 3];
+        std::string options[3] = { "piedra", "papel", "tijera" };
+        std::string bot_move = options[rand() % 3];
 
         // Determinar el resultado
-        std::string resultado;
-        if (jugada_usuario == jugada_bot_str) 
-            resultado = "Empate!";
-        else if ((jugada_usuario == "piedra" && jugada_bot_str == "tijera") ||
-                 (jugada_usuario == "papel" && jugada_bot_str == "piedra") ||
-                 (jugada_usuario == "tijera" && jugada_bot_str == "papel")) 
-            resultado = "Ganaste!";
+        std::string result;
+        if (user_move == bot_move) 
+            result = "Empate!";
+        else if ((user_move == "piedra" && bot_move == "tijera") ||
+                 (user_move == "papel" && bot_move == "piedra") ||
+                 (user_move == "tijera" && bot_move == "papel")) 
+            result = "Ganaste!";
         else 
-            resultado = "Perdiste!";
+            result = "Perdiste!";
 
         // Enviar respuesta al cliente
-        std::string respuesta = "Bot: Yo escogí " + jugada_bot_str + ". " + resultado + "\n";
-        send(client.getFd(), respuesta.c_str(), respuesta.length(), 0);
+        std::string response = "Bot: Yo escogí " + bot_move + ". " + result + "\n";
+        send(client.getFd(), response.c_str(), response.length(), 0);
     } 
     // Coinflip (cara o cruz)
-    else if (subcomando == "coinflip") 
+    else if (subcommand == "coinflip") 
     {
-        std::string resultado = (rand() % 2 == 0) ? "Salió cara!" : "Salió cruz!";
-        std::string respuesta = "Bot: " + resultado + "\n";
-        send(client.getFd(), respuesta.c_str(), respuesta.length(), 0);
+        std::string result = (rand() % 2 == 0) ? "Salió cara!" : "Salió cruz!";
+        std::string response = "Bot: " + result + "\n";
+        send(client.getFd(), response.c_str(), response.length(), 0);
     } 
     // Subcomando no reconocido
     else 
