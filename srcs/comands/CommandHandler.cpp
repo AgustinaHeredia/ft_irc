@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CommandHandler.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: patri <patri@student.42.fr>                +#+  +:+       +#+        */
+/*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:14 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/18 11:29:09 by patri            ###   ########.fr       */
+/*   Updated: 2025/03/19 20:24:54 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,18 @@ void CommandHandler::handleCommand(Client& client, const std::string& command) {
         std::string message;
         std::getline(iss, message);
         handleBot(client, message);
-    } else {
+    } else if (cmd == "DCC") {
+		std::string message;
+		std::getline(iss, message);
+		
+		if (message.find("SEND") != std::string::npos) {
+			handleDccSend(server, client, message);
+		} else if (message.find("ACCEPT") != std::string::npos) {
+			handleDccAccept(server, client, message);
+		} else {
+			send(client.getFd(), "ERROR: Comando DCC desconocido.\n", 40, 0);
+		}
+	} else {
         std::cout << "Comando desconocido" << std::endl;
 		const char* warning_msg = "Warning: Comando desconocido.\n";
         send(client.getFd(), warning_msg, strlen(warning_msg), 0);

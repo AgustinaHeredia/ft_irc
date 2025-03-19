@@ -6,7 +6,7 @@
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/02 13:39:53 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/15 15:21:22 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/19 20:27:47 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,11 @@ void CommandHandler::handlePrivmsg(Server &srv, Client &client, const std::strin
         return;
     }
 
+	// 🔹 Si el mensaje es un DCC SEND, procesarlo
+    if (msg.find("DCC SEND") == 0) {
+        handleDccSend(srv, client, msg);
+        return;
+    }
     std::cout << "[DEBUG] PRIVMSG de " << client.getNickname() << " para " << target << ": " << msg << std::endl;
 
     // Manejo de múltiples destinatarios

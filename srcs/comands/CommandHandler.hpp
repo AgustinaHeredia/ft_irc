@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CommandHandler.hpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: patri <patri@student.42.fr>                +#+  +:+       +#+        */
+/*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:09 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/18 11:29:16 by patri            ###   ########.fr       */
+/*   Updated: 2025/03/19 20:23:29 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,8 @@ class CommandHandler {
 		void handleWho(Server &srv, Client &client, const std::string& message);
 		void handleNotice(Server &srv, Client &client, const std::string &message);
 		void handleBot(Client &client, const std::string &message);
+		void handleDccSend(Server& srv, Client& sender, const std::string& msg);
+		void handleDccAccept(Server& srv, Client& receiver, const std::string& msg);
 };
 
 #endif
