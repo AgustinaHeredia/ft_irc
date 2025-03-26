@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   KICK.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
+/*   By: patri <patri@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 10:59:09 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/16 19:19:38 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/26 18:33:19 by patri            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,5 +80,7 @@ void CommandHandler::handleKick(Server &srv, Client &client, const std::string &
     std::string target_msg = "Has sido expulsado de " + channel_name + ". Motivo: " + reason + "\n";
     send(target->getFd(), target_msg.c_str(), target_msg.size(), 0);
 
+    channel->removeClient(*target);
+    
     std::cout << "[DEBUG] Usuario " << target_nick << " ha sido expulsado de " << channel_name << std::endl;
 }
