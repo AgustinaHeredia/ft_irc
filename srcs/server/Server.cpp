@@ -6,7 +6,7 @@
 /*   By: patri <patri@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:07:11 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/26 15:53:10 by patri            ###   ########.fr       */
+/*   Updated: 2025/03/26 18:56:53 by patri            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -241,9 +241,9 @@ void Server::acceptClients()
         // Comparar la contraseña exactamente, sin cambios de mayúsculas/minúsculas
         if (input_password == password)
         {
-            std::cout << "Cliente autenticado correctamente." << std::endl;
-            std::string welcome_msg = "Bienvenido al servidor IRC!\n";
-            send(client_fd, welcome_msg.c_str(), welcome_msg.size(), 0);
+            std::cout << "Contraseña aceptada." << std::endl;
+            std::string success_msg = "Contraseña aceptada. Continúe con NICK y luego USER.\n";
+            send(client_fd, success_msg.c_str(), success_msg.size(), 0);
             break;
         }
         else

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   USER.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
+/*   By: patri <patri@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/02 13:39:17 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/17 20:37:55 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/26 18:55:38 by patri            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,9 +22,9 @@ void CommandHandler::handleUserCommand(Client &client, const std::string &messag
     std::istringstream iss(message);
     std::string username, hostname, servername, realname;
     
-    iss >> username >> hostname >> servername; // Leer los primeros 4 parámetros
+    iss >> username >> hostname >> servername; // Leer los primeros 3 parámetros
 
-    std::getline(iss >> std::ws, realname);
+    std::getline(iss >> std::ws, realname); // Leer el realname
 
     std::cout << "[DEBUG] USER recibido - Username: " << username 
               << ", Hostname: " << hostname 
@@ -38,14 +38,22 @@ void CommandHandler::handleUserCommand(Client &client, const std::string &messag
         return;
     }
 
+    // Verificar que ya se haya enviado un NICK
+    if (client.getNickname().empty()) {
+        const char* error_msg = "ERROR: Falta el NICK antes de USER.\n";
+        send(client.getFd(), error_msg, strlen(error_msg), 0);
+        return;
+    }
+
     // Asignar valores al cliente
     client.setUsername(username);
     client.setRealname(realname);
     client.authenticate();
 
+    // Enviar mensaje de bienvenida si la autenticación es exitosa
     if (client.isAuthenticated()) {
-        const char* success_msg = "Autenticación completa.\n";
-        send(client.getFd(), success_msg, strlen(success_msg), 0);
+        const char* welcome_msg = "Bienvenido al servidor IRC!\n";
+        send(client.getFd(), welcome_msg, strlen(welcome_msg), 0);
     } else {
         const char* warning_msg = "Warning: Falta el NICK para completar la autenticación.\n";
         send(client.getFd(), warning_msg, strlen(warning_msg), 0);
