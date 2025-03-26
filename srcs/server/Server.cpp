@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
+/*   By: patri <patri@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:07:11 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/16 19:09:49 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/26 13:07:10 by patri            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 #include <cstring>
 #include <poll.h>
 #include <arpa/inet.h>
+#include <algorithm>
 
 #define BUFFER_SIZE 1024
 #define BACKLOG 10
@@ -157,72 +158,124 @@ void Server::stop() {
     fds.clear();  // Limpiar el vector de fds
 }
 
-void Server::acceptClients() {
+void Server::acceptClients()
+{
     sockaddr_in client_addr;
     socklen_t client_len = sizeof(client_addr);
     int client_fd = accept(server_fd, (struct sockaddr*)&client_addr, &client_len);
 
-    if (client_fd == -1) {
+    if (client_fd == -1)
+    {
         std::cerr << "Error al aceptar la conexión: " << strerror(errno) << std::endl;
         return;
     }
 
-    // Límite de clientes para evitar sobrecarga
-    if (fds.size() >= MAX_CLIENTS) {
+    if (fds.size() >= MAX_CLIENTS)
+    {
         std::cerr << "Conexión rechazada: demasiados clientes conectados." << std::endl;
         close(client_fd);
         return;
     }
 
-    std::cout << "Nuevo cliente conectado desde " 
-              << inet_ntoa(client_addr.sin_addr) << ":" 
+    std::cout << "Nuevo cliente conectado desde "
+              << inet_ntoa(client_addr.sin_addr) << ":"
               << ntohs(client_addr.sin_port) << std::endl;
 
-    //  Pedir la contraseña al cliente
-    std::string password_prompt = "Ingrese la contraseña del servidor:\n";
+    std::string password_prompt = "Ingrese la contraseña con el formato: PASS <password>\n";
     send(client_fd, password_prompt.c_str(), password_prompt.size(), 0);
 
+    int attempts = 0;
+    std::string received_input;
     char buffer[256];
-    memset(buffer, 0, sizeof(buffer));
-    ssize_t bytes_received = recv(client_fd, buffer, sizeof(buffer) - 1, 0);
-    
-    if (bytes_received <= 0) {
-        std::cerr << "Error al recibir la contraseña del cliente." << std::endl;
-        close(client_fd);
-        return;
+
+    while (attempts < 3)  // Permitir exactamente 3 intentos
+    {
+        memset(buffer, 0, sizeof(buffer));
+        ssize_t bytes_received = recv(client_fd, buffer, sizeof(buffer) - 1, 0);
+
+        if (bytes_received <= 0)
+        {
+            std::cerr << "Error al recibir la contraseña del cliente." << std::endl;
+            close(client_fd);
+            return;
+        }
+
+        buffer[bytes_received] = '\0'; // Asegurar terminación de cadena
+        received_input = buffer;
+
+        // Limpiar correctamente '\r' y '\n'
+        size_t end = received_input.find_last_not_of("\r\n");
+        if (end != std::string::npos)
+            received_input = received_input.substr(0, end + 1);
+        else
+            received_input = "";
+
+        // Si la línea está vacía, ignorarla sin contar como intento
+        if (received_input.empty())
+        {
+            continue;
+        }
+
+        std::cout << "Recibido: [" << received_input << "]" << std::endl;
+
+        // Se exige que el comando empiece exactamente con "PASS "
+        if (received_input.compare(0, 5, "PASS ") != 0)
+        {
+            std::stringstream ss;
+            ss << "Formato incorrecto. Intentos restantes: " << (2 - attempts) << "\n";
+            std::string error_msg = ss.str();
+            send(client_fd, error_msg.c_str(), error_msg.size(), 0);
+            std::cerr << error_msg;
+            attempts++;
+            continue;
+        }
+
+        // Extraer la contraseña enviada
+        std::string input_password = received_input.substr(5); // Quitar "PASS "
+
+        // Comparar la contraseña exactamente, sin cambios de mayúsculas/minúsculas
+        if (input_password == password)
+        {
+            std::cout << "Cliente autenticado correctamente." << std::endl;
+            std::string welcome_msg = "Bienvenido al servidor IRC!\n";
+            send(client_fd, welcome_msg.c_str(), welcome_msg.size(), 0);
+            break;
+        }
+        else
+        {
+            std::stringstream ss;
+            ss << "Contraseña incorrecta. Intentos restantes: " << (2 - attempts) << "\n";
+            std::string error_msg = ss.str();
+            send(client_fd, error_msg.c_str(), error_msg.size(), 0);
+            std::cerr << error_msg;
+            attempts++;
+            continue;
+        }
     }
 
-    //  Eliminar caracteres de nueva línea
-    std::string received_password(buffer);
-    received_password.erase(received_password.find_last_not_of("\r\n") + 1);
-
-    //  Verificar la contraseña
-    if (received_password != password) {
-        std::cerr << "Conexión rechazada: contraseña incorrecta." << std::endl;
+    if (attempts >= 3)  // Se agotaron los intentos
+    {
         std::string error_msg = "ERROR: Contraseña incorrecta. Conexión cerrada.\n";
         send(client_fd, error_msg.c_str(), error_msg.size(), 0);
+        std::cerr << error_msg;
         close(client_fd);
         return;
     }
 
-    //  Si la contraseña es correcta, continuar con la conexión
-    std::cout << "Cliente autenticado correctamente." << std::endl;
+    // Limpiar cualquier input residual en el buffer
+    while (recv(client_fd, buffer, sizeof(buffer) - 1, MSG_DONTWAIT) > 0)
+        ;
 
-    //  Agregar cliente a `poll()`
+    // Agregar cliente a poll()
     pollfd client_pollfd;
     client_pollfd.fd = client_fd;
-    client_pollfd.events = POLLIN;  // Solo escuchar lectura al inicio
+    client_pollfd.events = POLLIN;
     fds.push_back(client_pollfd);
 
-    //  Crear y almacenar el nuevo cliente
+    // Crear y almacenar el nuevo cliente
     Client* new_client = new Client(client_fd, client_addr);
     clientManager.addClient(new_client);
-
-    //  Enviar mensaje de bienvenida
-    std::string welcome_msg = "Bienvenido al servidor IRC!\n";
-    send(client_fd, welcome_msg.c_str(), welcome_msg.size(), 0);
 }
-
 
 ClientManager &Server::getClientManager() {
     return clientManager;
