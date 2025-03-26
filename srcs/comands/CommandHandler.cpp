@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CommandHandler.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
+/*   By: patri <patri@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:14 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/19 20:24:54 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/26 15:47:53 by patri            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ CommandHandler::CommandHandler(Server &srv) : server(srv) {}
 
 void CommandHandler::handleCommand(Client& client, const std::string& command) {
     std::cout << "Manejando comando: " << command << std::endl;
+    std::cout << command << std::endl;
 	std::istringstream iss(command);
     std::string cmd;
     iss >> cmd;

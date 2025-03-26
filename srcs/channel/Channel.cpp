@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
+/*   By: patri <patri@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:27 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/15 10:50:00 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/03/26 15:34:57 by patri            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,16 @@ void Channel::addOperator(Client& client) {
 
 void Channel::removeOperator(Client& client) {
     operators.erase(std::remove(operators.begin(), operators.end(), &client), operators.end());
+}
+
+void Channel::setOperator(Client& client, bool isOperator) {
+    if (isOperator) {
+        // Si isOperator es verdadero, agregarlo como operador
+        addOperator(client);
+    } else {
+        // Si isOperator es falso, eliminarlo como operador
+        removeOperator(client);
+    }
 }
 
 void Channel::setInviteOnly(bool state) {

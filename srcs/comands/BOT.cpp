@@ -6,7 +6,7 @@
 /*   By: patri <patri@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/02 13:40:26 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/18 11:54:15 by patri            ###   ########.fr       */
+/*   Updated: 2025/03/26 16:01:08 by patri            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,9 +18,15 @@
 #include <sstream>
 #include <algorithm>
 
-
 void CommandHandler::handleBot(Client &client, const std::string &message) 
 {
+    // Verificar autenticación del usuario
+    if (!client.isAuthenticated()) {
+        const char* error_msg = "Warning: Falta completar la autenticación.\n";
+        send(client.getFd(), error_msg, strlen(error_msg), 0);
+        return;  // Asegúrate de que la función termine aquí si no está autenticado.
+    }
+
     // Si no hay argumentos, mostrar el menú de opciones disponibles
     if (message.empty()) 
     {
@@ -87,7 +93,7 @@ void CommandHandler::handleBot(Client &client, const std::string &message)
         send(client.getFd(), response.c_str(), response.length(), 0);
     } 
     // Subcomando no reconocido
-    else 
+    else
     {
         const char* error_msg = "ERROR: Subcomando no reconocido. Usa !bot para ver las opciones.\n";
         send(client.getFd(), error_msg, strlen(error_msg), 0);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
+/*   By: patri <patri@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:22 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/09 21:25:27 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/26 15:34:25 by patri            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,8 @@ class Channel {
 		bool isOperator(const Client &client) const;
 		void addOperator(Client& client);
 		void removeOperator(Client &client);
+		void setOperator(Client& client, bool isOperator);
+
 
 		void setInviteOnly(bool state);
 		bool isInviteOnly() const;

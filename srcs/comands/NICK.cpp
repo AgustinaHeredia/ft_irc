@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   NICK.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
+/*   By: patri <patri@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/02 13:38:59 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/15 17:27:02 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/26 15:05:19 by patri            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ void CommandHandler::handleNickCommand(Server& srv, Client& client, const std::s
     srv.getClientManager().addNickname(nick, &client);
     client.authenticate();
 
-    if (client.isAuthenticated()) {
+    if (client.isAuthenticated()) { //CREO QUE HAY QUE QUITAR ESO
         const char* success_msg = "Autenticación completa.\n";
         send(client.getFd(), success_msg, strlen(success_msg), 0);
     } else {

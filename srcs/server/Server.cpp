@@ -6,7 +6,7 @@
 /*   By: patri <patri@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:07:11 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/26 13:07:10 by patri            ###   ########.fr       */
+/*   Updated: 2025/03/26 15:53:10 by patri            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,8 +108,7 @@ void Server::process() {
                 std::cerr << "Error: Cliente no encontrado para fd " << fds[i].fd << std::endl;
                 continue;
             }
-
-            //  Acumular datos recibidos en el cliente
+            // Acumular datos recibidos en el cliente
             client->getPartialCommand() += buffer;
             std::cout << "Comando parcial acumulado: " << client->getPartialCommand() << std::endl;
 
@@ -117,11 +116,17 @@ void Server::process() {
             size_t pos;
             while ((pos = client->getPartialCommand().find("\n")) != std::string::npos) {
                 std::string single_command = client->getPartialCommand().substr(0, pos);
-                client->getPartialCommand().erase(0, pos + 2);  // Eliminar comando procesado
+                client->getPartialCommand().erase(0, pos + 1);  // Eliminar comando procesado
 
-                // Manejar el comando
-                std::cout << "Comando recibido: [" << single_command << "]" << std::endl;
-                commandHandler.handleCommand(*client, single_command);
+                // Limpiar espacios y saltos de línea al principio y al final del comando
+                single_command.erase(0, single_command.find_first_not_of(" \t\r\n"));
+                single_command.erase(single_command.find_last_not_of(" \t\r\n") + 1);
+
+                if (!single_command.empty()) {
+                    // Manejar el comando
+                    std::cout << "Comando recibido: [" << single_command << "]" << std::endl;
+                    commandHandler.handleCommand(*client, single_command);
+                }
             }
         }
 
