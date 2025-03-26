@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   DCC.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
+/*   By: patri <patri@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 20:14:46 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/21 19:40:34 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/26 15:00:02 by patri            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,6 @@
 #include <cstdio>
 #include <cerrno>
 
-
 void CommandHandler::handleDccSend(Server &srv, Client &sender, const std::string &msg) {
     std::istringstream iss(msg);
     std::string send_cmd, filename, ip_str, port_str, size_str;
@@ -33,7 +32,7 @@ void CommandHandler::handleDccSend(Server &srv, Client &sender, const std::strin
     iss >> send_cmd >> filename >> ip_str >> port_str >> size_str;
 
     if (send_cmd != "SEND") {
-		const char* error_msg = "ERROR: Formato incorrecto de DCC SEND.\n";
+        const char* error_msg = "ERROR: Formato incorrecto de DCC SEND.\n";
         send(sender.getFd(), error_msg, strlen(error_msg), 0);
         return;
     }
@@ -41,19 +40,27 @@ void CommandHandler::handleDccSend(Server &srv, Client &sender, const std::strin
     std::string target_nick = sender.getPartialCommand();
     Client* recipient = srv.getClientManager().getClientByNickname(target_nick);
     if (!recipient) {
-		const char* error_msg = "ERROR: Usuario destinatario no encontrado.\n";
+        const char* error_msg = "ERROR: Usuario destinatario no encontrado.\n";
         send(sender.getFd(), error_msg, strlen(error_msg), 0);
         return;
     }
 
-    //  Convertir puerto correctamente
-    int port = strtol(port_str.c_str(), NULL, 10);
-    if (port <= 0 || port > 65535) {
+    // Convertir puerto
+    char* end_ptr;
+    long port = strtol(port_str.c_str(), &end_ptr, 10);
+    if (*end_ptr != '\0' || port <= 0 || port > 65535) {
         std::cerr << "[DCC] Puerto inválido." << std::endl;
         return;
     }
 
-    //  Crear socket
+    // Convertir IP
+    in_addr_t ip = inet_addr(ip_str.c_str());
+    if (ip == INADDR_NONE) {
+        std::cerr << "[DCC] IP inválida." << std::endl;
+        return;
+    }
+
+    // Crear socket
     int file_sock = socket(AF_INET, SOCK_STREAM, 0);
     if (file_sock == -1) {
         std::cerr << "[DCC] Error al crear socket." << std::endl;
@@ -79,12 +86,12 @@ void CommandHandler::handleDccSend(Server &srv, Client &sender, const std::strin
 
     std::cout << "[DCC] Esperando conexión en el puerto " << port << " para el archivo " << filename << std::endl;
 
-    //  Notificar al destinatario
+    // Notificar al destinatario
     std::string dcc_msg = ":" + sender.getNickname() + " PRIVMSG " + target_nick +
                           " :DCC SEND " + filename + " " + ip_str + " " + port_str + " " + size_str + "\n";
     send(recipient->getFd(), dcc_msg.c_str(), dcc_msg.size(), 0);
 
-    //  Aceptar conexión de Bob
+    // Aceptar conexión
     sockaddr_in client_addr;
     socklen_t client_len = sizeof(client_addr);
     int client_fd = accept(file_sock, (struct sockaddr*)&client_addr, &client_len);
@@ -96,7 +103,7 @@ void CommandHandler::handleDccSend(Server &srv, Client &sender, const std::strin
 
     std::cout << "[DCC] Conexión establecida con " << inet_ntoa(client_addr.sin_addr) << std::endl;
 
-    //  Abrir archivo con `fopen()`
+    // Abrir archivo
     FILE *file = fopen(filename.c_str(), "rb");
     if (!file) {
         std::cerr << "[DCC] Error al abrir el archivo." << std::endl;
@@ -121,19 +128,37 @@ void CommandHandler::handleDccAccept(Server& srv, Client& receiver, const std::s
     std::istringstream iss(msg);
     std::string accept, filename, port_str, position_str;
 
-	std::cout << "[DEBUG] Recibido PRIVMSG: " << msg << std::endl;
+    std::cout << "[DEBUG] Recibido PRIVMSG: " << msg << std::endl;
     iss >> accept >> filename >> port_str >> position_str;
 
-	(void)srv;
+    (void)srv;
     if (accept != "ACCEPT") {
-		const char* error_msg = "ERROR: Formato incorrecto de DCC ACCEPT.\n";
+        const char* error_msg = "ERROR: Formato incorrecto de DCC ACCEPT.\n";
         send(receiver.getFd(), error_msg, strlen(error_msg), 0);
         return;
     }
 
     std::cout << "[DCC] " << receiver.getNickname() << " ha aceptado la transferencia de " << filename << std::endl;
 
-    //  Conectarse al remitente para recibir el archivo
+    // Convertir puerto
+    char* end_ptr;
+    long port = strtol(port_str.c_str(), &end_ptr, 10);
+    if (*end_ptr != '\0' || port <= 0 || port > 65535) {
+        const char* error_msg = "ERROR: Puerto inválido.\n";
+        send(receiver.getFd(), error_msg, strlen(error_msg), 0);
+        return;
+    }
+
+    // Convertir IP
+    const std::string& ip_str = receiver.getPartialCommand();
+    in_addr_t ip = inet_addr(ip_str.c_str());
+    if (ip == INADDR_NONE) {
+        const char* error_msg = "ERROR: IP inválida.\n";
+        send(receiver.getFd(), error_msg, strlen(error_msg), 0);
+        return;
+    }
+
+    // Crear socket
     int sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock == -1) {
         std::cerr << "[DCC] Error al crear socket de cliente." << std::endl;
@@ -142,8 +167,8 @@ void CommandHandler::handleDccAccept(Server& srv, Client& receiver, const std::s
 
     sockaddr_in server_addr;
     server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(std::stoi(port_str));
-    inet_pton(AF_INET, receiver.getPartialCommand().c_str(), &server_addr.sin_addr);
+    server_addr.sin_port = htons(port);
+    server_addr.sin_addr.s_addr = ip;
 
     if (connect(sock, (struct sockaddr*)&server_addr, sizeof(server_addr)) == -1) {
         std::cerr << "[DCC] Error al conectarse con el remitente." << std::endl;
@@ -151,7 +176,7 @@ void CommandHandler::handleDccAccept(Server& srv, Client& receiver, const std::s
         return;
     }
 
-    //  Crear archivo para escribir los datos recibidos
+    // Crear archivo
     int file_fd = open(filename.c_str(), O_WRONLY | O_CREAT, 0644);
     if (file_fd == -1) {
         std::cerr << "[DCC] Error al abrir archivo para escritura." << std::endl;
