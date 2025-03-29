@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:42 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/29 15:40:03 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/03/29 16:50:18 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,9 @@ class Server {
 		void process();
 		ClientManager &getClientManager(); // Método para obtener el ClientManager
     	ChannelManager &getChannelManager(); // Método para obtener el ChannelManager
+		const std::string& getServerName() const;
+		const std::string& getServerVersion() const;
+		void sendWelcomeMessage(Client& client);
 };
 
 #endif

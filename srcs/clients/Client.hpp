@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:31 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/29 15:44:02 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/03/29 16:39:51 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ private:
 	std::string realname;
     bool authenticated;
 	std::string partialCommand;
+    std::string hostname;
 
 public:
     Client(int fd, sockaddr_in addr);
@@ -51,6 +52,8 @@ public:
 	void setRealname(const std::string &name);
 
 	std::string &getPartialCommand();
+    std::string getHostname() const;
+    void setHostname(const std::string& host);
 };
 
 #endif

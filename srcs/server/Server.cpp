@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:07:11 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/29 15:55:32 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/03/29 16:50:25 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -297,6 +297,25 @@ void Server::acceptClients()
     clientManager.addClient(new_client);
 
     std::cout << "New client authenticated and added to the server." << std::endl;
+}
+
+const std::string& Server::getServerName() const {
+    static const std::string serverName = "ircserv";
+    return serverName;
+}
+
+const std::string& Server::getServerVersion() const {
+    static const std::string version = "1.0";
+    return version;
+}
+
+void Server::sendWelcomeMessage(Client& client) {
+    std::string welcome = "001 " + client.getNickname() + 
+                         " :Welcome to the IRC Network " + 
+                         client.getNickname() + "!" + 
+                         client.getUsername() + "@" + 
+                         client.getHostname() + "\r\n";
+    send(client.getFd(), welcome.c_str(), welcome.size(), 0);
 }
 
 ClientManager &Server::getClientManager() {

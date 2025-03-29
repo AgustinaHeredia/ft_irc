@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:14 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/29 16:13:45 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/03/29 16:50:30 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,18 +22,45 @@
 CommandHandler::CommandHandler(Server &srv) : server(srv) {}
 
 void CommandHandler::handleCommand(Client& client, const std::string& command) {
-    // Solo procesamos comandos si el cliente está autenticado
-    if (!client.isAuthenticated()) {
-        std::cout << "Client not authenticated. Ignoring command: " << command << std::endl;
-        return;
-    }
-
-    std::cout << "Handling command: " << command << std::endl;
     std::istringstream iss(command);
     std::string cmd;
     iss >> cmd;
     std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::toupper);
-    std::cout << "Command: " << cmd << std::endl;
+
+    // Manejar CAP incluso si el cliente no está autenticado
+    if (cmd == "CAP") {
+        std::string subcmd;
+        iss >> subcmd;
+        std::transform(subcmd.begin(), subcmd.end(), subcmd.begin(), ::toupper);
+        
+        std::string response = "CAP * ";
+        
+        if (subcmd == "LS") {
+            response += "LS :\r\n";
+        }
+        else if (subcmd == "LIST") {
+            response += "LIST :\r\n";
+        }
+        else if (subcmd == "REQ") {
+            response += "NAK :\r\n";
+        }
+        else if (subcmd == "END") {
+            response += "ACK :\r\n";
+        }
+        else {
+            response = "410 " + cmd + " :Invalid CAP subcommand\r\n";
+        }
+        
+        send(client.getFd(), response.c_str(), response.size(), 0);
+        return;
+    }
+
+    // Solo procesamos otros comandos si el cliente está autenticado
+    if (!client.isAuthenticated()) {
+        std::string msg = "451 * :You have not registered\r\n";
+        send(client.getFd(), msg.c_str(), msg.size(), 0);
+        return;
+    }
 
     if (cmd == "NICK") {
         std::string nick;
@@ -96,11 +123,6 @@ void CommandHandler::handleCommand(Client& client, const std::string& command) {
         } else {
             send(client.getFd(), "ERROR: Unknown DCC command.\n", 30, 0);
         }
-    } else if (cmd == "CAP") {
-        // Ignoramos cualquier comando CAP que llegue desde el cliente
-        std::string cap_end_response = "CAP END\r\n";
-        send(client.getFd(), cap_end_response.c_str(), cap_end_response.size(), 0);
-        std::cout << "Responding to CAP END" << std::endl;
     } else {
         std::cout << "Unknown command." << std::endl;
         const char* warning_msg = "Warning: Unknown command.\n";

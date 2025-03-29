@@ -6,19 +6,27 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:37 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/29 15:43:49 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/03/29 16:39:02 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Client.hpp"
 #include <iostream>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <cstring>
 
-Client::Client(int fd, sockaddr_in addr) : client_fd(fd), client_addr(addr), connected(true) {
-
-	// Usar client_addr para mostrar la dirección del cliente
+Client::Client(int fd, sockaddr_in addr) : 
+    client_fd(fd), 
+    client_addr(addr), 
+    connected(true),
+    authenticated(false) {
+    
+    // Obtener IP y hostname
     char client_ip[INET_ADDRSTRLEN];
     inet_ntop(AF_INET, &(client_addr.sin_addr), client_ip, INET_ADDRSTRLEN);
-	connected = true;
+    hostname = client_ip; // Usamos la IP como hostname por defecto
+    
     std::cout << "Client connected from " << client_ip << ":" << ntohs(client_addr.sin_port) << std::endl;
 }
 
@@ -29,13 +37,17 @@ Client::~Client() {
 }
 
 bool Client::isConnected() {
-	if ((client_fd != -1)) {
-		connected = true;
-	}
+    if (client_fd != -1) {
+        connected = true;
+    }
     return connected; 
 }
 
 void Client::disconnect() {
+    if (client_fd != -1) {
+        close(client_fd);
+        client_fd = -1;
+    }
     connected = false;
 }
 
@@ -49,7 +61,7 @@ void Client::handleMessages() {
             break;
         }
         std::string command(buffer);
-	}
+    }
 }
 
 int Client::getFd() const {
@@ -62,6 +74,14 @@ std::string Client::getNickname() const {
 
 std::string Client::getUsername() const {
     return username;
+}
+
+std::string Client::getRealname() const {
+    return realname;
+}
+
+std::string Client::getHostname() const {
+    return hostname;
 }
 
 bool Client::isAuthenticated() const {
@@ -87,13 +107,9 @@ void Client::setUsername(const std::string &user) {
 }
 
 std::string &Client::getPartialCommand() { 
-	return partialCommand;
+    return partialCommand;
 }
 
 void Client::setRealname(const std::string &name) {
     realname = name;
-}
-
-std::string Client::getRealname() const {
-    return realname;
 }
