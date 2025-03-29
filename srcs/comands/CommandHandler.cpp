@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CommandHandler.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
+/*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:14 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/29 11:09:40 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/29 14:26:52 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,8 +25,8 @@ void CommandHandler::handleCommand(Client& client, const std::string& command) {
     std::cout << command << std::endl;
 	std::istringstream iss(command);
     std::string cmd;
-	std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::toupper);
     iss >> cmd;
+	std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::toupper);
 
     if (cmd == "NICK") {
         std::string nick;
