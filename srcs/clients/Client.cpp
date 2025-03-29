@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
+/*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:37 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/29 11:02:22 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/29 15:43:49 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,10 @@ void Client::authenticate() {
     if (!nickname.empty() && !username.empty()) {
         authenticated = true;
     }
+}
+
+void Client::markAsAuthenticated(bool auth) {
+    authenticated = auth;
 }
 
 void Client::setNickname(const std::string &nick) {
