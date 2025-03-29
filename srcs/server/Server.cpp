@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
+/*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:07:11 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/29 12:03:00 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/29 12:33:15 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,6 +92,7 @@ void Server::process() {
             // Cliente se desconectó
             if (bytes_received <= 0) {
                 std::cout << "Client disconnected: " << fds[i].fd << std::endl;
+                clientManager.removeNickname(clientManager.getClientByFd(fds[i].fd)->getNickname());
                 clientManager.removeClient(clientManager.getClientByFd(fds[i].fd));
                 close(fds[i].fd);
                 fds.erase(fds.begin() + i);
