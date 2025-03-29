@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
+/*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:07:11 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/29 12:33:15 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/03/29 13:34:26 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,14 +91,24 @@ void Server::process() {
 
             // Cliente se desconectó
             if (bytes_received <= 0) {
-                std::cout << "Client disconnected: " << fds[i].fd << std::endl;
-                clientManager.removeNickname(clientManager.getClientByFd(fds[i].fd)->getNickname());
-                clientManager.removeClient(clientManager.getClientByFd(fds[i].fd));
-                close(fds[i].fd);
-                fds.erase(fds.begin() + i);
-                i--;
-                continue;
-            }
+				std::cout << "Client disconnected: " << fds[i].fd << std::endl;
+			
+				// Obtener el cliente
+				Client* client = clientManager.getClientByFd(fds[i].fd);
+				if (client) {
+					// Eliminar el nickname del cliente
+					clientManager.removeNickname(client->getNickname());
+				}
+			
+				// Eliminar el cliente de clientManager
+				clientManager.removeClient(client);
+			
+				// Cerrar el descriptor de archivo y eliminarlo de poll()
+				close(fds[i].fd);
+				fds.erase(fds.begin() + i);
+				i--;
+				continue;
+			}
 
             buffer[bytes_received] = '\0';  // Asegurar terminación de cadena
             std::cout << "Data received: " << buffer << std::endl;

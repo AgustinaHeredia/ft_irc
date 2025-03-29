@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ClientManager.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
+/*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/02 18:20:12 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/15 12:24:08 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/03/29 13:34:24 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,10 @@ void ClientManager::addNickname(const std::string &nick, Client* client){
 }
 
 void ClientManager::removeNickname(const std::string &nick){
-	nicknames.erase(nick);
+	if (!nick.empty()) {
+        nicknames.erase(nick);
+        std::cout << "[DEBUG] Nickname eliminado: " << nick << std::endl;
+    }
 }
 
 Client* ClientManager::getClientByNickname(const std::string &nick){
@@ -60,4 +63,5 @@ void ClientManager::clearAllClients() {
         delete *it;  // Liberar el cliente
     }
     clients.clear();
+	nicknames.clear();
 }
