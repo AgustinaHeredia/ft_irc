@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: patri <patri@student.42.fr>                +#+  +:+       +#+        */
+/*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:27 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/26 15:34:57 by patri            ###   ########.fr       */
+/*   Updated: 2025/03/29 11:01:55 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,13 +23,13 @@ Channel::~Channel() {}
 
 void Channel::addClient(Client& client) {
     clients.push_back(&client);
-    std::string welcome_msg = "Bienvenido al canal " + name + ", " + client.getNickname() + "!\n";
+    std::string welcome_msg = "Welcome to the channel " + name + ", " + client.getNickname() + "!\n";
     send(client.getFd(), welcome_msg.c_str(), welcome_msg.length(), 0);
 }
 
 void Channel::removeClient(Client &client) {
     clients.erase(std::remove(clients.begin(), clients.end(), &client), clients.end());
-    std::string goodbye_msg = client.getNickname() + " ha salido del canal " + name + ".\n";
+    std::string goodbye_msg = client.getNickname() + " has left the channel " + name + ".\n";
     broadcast(goodbye_msg);
 }
 
@@ -121,7 +121,7 @@ void Channel::setTopic(const std::string& newTopic) {
 }
 
 std::string Channel::getTopic() const {
-    return topic.empty() ? "No hay un tema establecido." : topic;
+    return topic.empty() ? "There is no established theme." : topic;
 }
 
 void Channel::inviteUser(Client& client) {

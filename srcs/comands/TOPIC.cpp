@@ -6,7 +6,7 @@
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/09 00:05:34 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/16 19:21:47 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/29 11:48:27 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,28 +23,28 @@ void CommandHandler::handleTopic(Server &srv, Client &client, const std::string 
     iss >> channel_name;
     std::getline(iss >> std::ws, topic); //  Captura el nuevo tema si existe
 
-    std::cout << "[DEBUG] Comando TOPIC recibido: " << message << std::endl;
-    std::cout << "[DEBUG] Canal: " << channel_name << ", Nuevo tema: " << topic << std::endl;
+    std::cout << "[DEBUG] TOPIC command received: " << message << std::endl;
+    std::cout << "[DEBUG] Channel: " << channel_name << ", New topic: " << topic << std::endl;
 
 	if (!client.isAuthenticated()) {
-        const char* error_msg = "Warning: Falta completar la autenticación.\n";
+        const char* error_msg = "Warning: Authentication is missing.\n";
         send(client.getFd(), error_msg, strlen(error_msg), 0);
-		std::cout << "[DEBUG] Cliente no autenticado intentó TOPIC " << std::endl;
+		std::cout << "[DEBUG] Unauthenticated client attempted TOPIC " << std::endl;
         return;
     }
 
     //  Verificar si el canal es válido
     if (channel_name.empty() || channel_name[0] != '#') {
-		const char* error_msg = "ERROR: Nombre de canal inválido. Debe comenzar con '#'.\n";
+		const char* error_msg = "ERROR: Invalid channel name. Must begin with '#'.\n";
         send(client.getFd(), error_msg, strlen(error_msg), 0);
         return;
     }
 
     //  Buscar el canal
     Channel* channel = srv.getChannelManager().getChannelByName(channel_name);
-    std::cout << "[DEBUG] Recibido KICK: " << message << std::endl;
+    std::cout << "[DEBUG] Received KICK: " << message << std::endl;
 	if (!channel) {
-        const char* error_msg = "ERROR: Canal no encontrado.\n";
+        const char* error_msg = "ERROR: Channel not found.\n";
         send(client.getFd(), error_msg, strlen(error_msg), 0);
 		return;
     }
@@ -58,14 +58,14 @@ void CommandHandler::handleTopic(Server &srv, Client &client, const std::string 
 
     //  Verificar si el cliente está en el canal
     if (!channel->isClientInChannel(client)) {
-        const char* error_msg = "ERROR: No estás en este canal.\n";
+        const char* error_msg = "ERROR: You are not on this channel.\n";
         send(client.getFd(), error_msg, strlen(error_msg), 0);
 		return;
     }
 
     //  Verificar si el cliente es operador
     if (!channel->isOperator(client)) {
-        const char* error_msg = "ERROR: No tienes permisos para cambiar el tema.\n";
+        const char* error_msg = "ERROR: You do not have permission to change the theme.\n";
         send(client.getFd(), error_msg, strlen(error_msg), 0);
 		return;
     }

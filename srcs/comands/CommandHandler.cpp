@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CommandHandler.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: patri <patri@student.42.fr>                +#+  +:+       +#+        */
+/*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:14 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/26 15:47:53 by patri            ###   ########.fr       */
+/*   Updated: 2025/03/29 11:09:40 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,14 +15,17 @@
 #include "../server/ClientManager.hpp"
 #include <iostream>
 #include <sstream>
+#include <algorithm>
+#include <cctype>
 
 CommandHandler::CommandHandler(Server &srv) : server(srv) {}
 
 void CommandHandler::handleCommand(Client& client, const std::string& command) {
-    std::cout << "Manejando comando: " << command << std::endl;
+    std::cout << "Handling command: " << command << std::endl;
     std::cout << command << std::endl;
 	std::istringstream iss(command);
     std::string cmd;
+	std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::toupper);
     iss >> cmd;
 
     if (cmd == "NICK") {
@@ -34,7 +37,7 @@ void CommandHandler::handleCommand(Client& client, const std::string& command) {
         std::getline(iss, user);
         handleUserCommand(client, user);
     } else if (cmd == "QUIT") {
-        std::cout << "Comando QUIT recibido" << std::endl;
+        std::cout << "QUIT command received" << std::endl;
         server.getClientManager().removeClient(&client);
     } else if (cmd == "PRIVMSG") {
         std::string message;
@@ -85,11 +88,11 @@ void CommandHandler::handleCommand(Client& client, const std::string& command) {
 		} else if (message.find("ACCEPT") != std::string::npos) {
 			handleDccAccept(server, client, message);
 		} else {
-			send(client.getFd(), "ERROR: Comando DCC desconocido.\n", 40, 0);
+			send(client.getFd(), "ERROR: Unknown DCC command.\n", 40, 0);
 		}
 	} else {
-        std::cout << "Comando desconocido" << std::endl;
-		const char* warning_msg = "Warning: Comando desconocido.\n";
+        std::cout << "Unknown command." << std::endl;
+		const char* warning_msg = "Warning: Unknown command.\n";
         send(client.getFd(), warning_msg, strlen(warning_msg), 0);
     }
 }

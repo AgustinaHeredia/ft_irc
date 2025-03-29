@@ -6,7 +6,7 @@
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/09 19:14:17 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/16 19:20:47 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/29 11:20:07 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,19 +35,19 @@ void CommandHandler::handleMode(Server &srv, Client &client, const std::string &
     std::string channel_name, mode, param;
     iss >> channel_name >> mode >> param;
 
-    std::cout << "[DEBUG] Comando MODE recibido: " << message << std::endl;
-    std::cout << "[DEBUG] Canal: " << channel_name << ", Modo: " << mode << ", Parametro: " << param << std::endl;
+    std::cout << "[DEBUG] MODE command received: " << message << std::endl;
+    std::cout << "[DEBUG] Channel: " << channel_name << ", Mode: " << mode << ", Parameter: " << param << std::endl;
 
 	if (!client.isAuthenticated()) {
-        const char* error_msg = "Warning: Falta completar la autenticación.\n";
+        const char* error_msg = "Warning: Authentication is missing.\n";
         send(client.getFd(), error_msg, strlen(error_msg), 0);
-		std::cout << "[DEBUG] Cliente no autenticado intentó MODE " << std::endl;
+		std::cout << "[DEBUG] Unauthenticated client attempted MODE " << std::endl;
         return;
     }
 
     //  Verificar si el canal es válido
     if (channel_name.empty() || channel_name[0] != '#') {
-        const char* error_msg = "ERROR: Nombre de canal inválido. Debe comenzar con '#'.\n";
+        const char* error_msg = "ERROR: Invalid channel name. Must begin with '#'.\n";
         send(client.getFd(), error_msg, strlen(error_msg), 0);
 		return;
     }
@@ -55,13 +55,13 @@ void CommandHandler::handleMode(Server &srv, Client &client, const std::string &
     //  Buscar el canal
     Channel* channel = srv.getChannelManager().getChannelByName(channel_name);
     if (!channel) {
-        const char* error_msg = "ERROR: Canal no encontrado.\n";
+        const char* error_msg = "ERROR: Channel not found.\n";
         send(client.getFd(), error_msg, strlen(error_msg), 0);
 		return;
     }
 
     if (!channel->isOperator(client)) {
-        const char* error_msg = "ERROR: No tienes permisos para cambiar los modos del canal.\n";
+        const char* error_msg = "ERROR: You do not have permission to change channel modes.\n";
 		send(client.getFd(), error_msg, strlen(error_msg), 0);
         return;
     }
@@ -103,7 +103,7 @@ void CommandHandler::handleMode(Server &srv, Client &client, const std::string &
         channel->removeUserLimit();
         channel->broadcast(":" + client.getNickname() + " MODE " + channel_name + " -l\n");
     } else {
-        const char* error_msg = "ERROR: Modo no reconocido.\n";
+        const char* error_msg = "ERROR: Mode not recognized.\n";
 		send(client.getFd(), error_msg, strlen(error_msg), 0);
     }
 }

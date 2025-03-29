@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: patri <patri@student.42.fr>                +#+  +:+       +#+        */
+/*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:07:11 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/26 18:56:53 by patri            ###   ########.fr       */
+/*   Updated: 2025/03/29 12:03:00 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,13 +31,13 @@ void Server::start() {
 	// 1️ Crear el socket del servidor
 	server_fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (server_fd == -1) {
-		throw std::runtime_error("Error al crear el socket");
+		throw std::runtime_error("Error creating socket");
 	}
 
 	// 2️ Configurar la opción SO_REUSEADDR para reutilizar la dirección del socket
     int opt = 1;
     if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1) {
-        throw std::runtime_error("Error al configurar el socket");
+        throw std::runtime_error("Error configuring socket");
     }
 
 	// 3 Configurar la dirección del servidor
@@ -49,12 +49,12 @@ void Server::start() {
 
     // 4 Vincular el socket al puerto
     if (bind(server_fd, (struct sockaddr*)&server_addr, sizeof(server_addr)) == -1) {
-        throw std::runtime_error("Error al vincular el socket");
+        throw std::runtime_error("Error binding socket");
     }
 
     // 5 Poner el socket en modo escucha
     if (listen(server_fd, BACKLOG) == -1) {
-        throw std::runtime_error("Error al poner el socket en modo escucha");
+        throw std::runtime_error("Error putting socket in listening mode");
     }
 
     // 6 Configurar poll() para manejar múltiples conexiones
@@ -63,16 +63,16 @@ void Server::start() {
     server_pollfd.events = POLLIN;
     fds.push_back(server_pollfd);
 
-	std::cout << "Servidor iniciado en el puerto " << port << "." << std::endl;
+	std::cout << "Server started on port " << port << "." << std::endl;
 }
 
 void Server::process() {
     int activity = poll(fds.data(), fds.size(), -1);
     if (activity == -1) {
         if (errno == EINTR) {
-            std::cerr << "Señal de interrupción recibida, cerrando servidor..." << std::endl;
+            std::cerr << "Interrupt signal received, closing server..." << std::endl;
         } else {
-            std::cerr << "Error en poll(), cerrando servidor..." << std::endl;
+            std::cerr << "Error in poll(), closing server..." << std::endl;
         }
         return;
     }
@@ -91,7 +91,7 @@ void Server::process() {
 
             // Cliente se desconectó
             if (bytes_received <= 0) {
-                std::cout << "Cliente desconectado: " << fds[i].fd << std::endl;
+                std::cout << "Client disconnected: " << fds[i].fd << std::endl;
                 clientManager.removeClient(clientManager.getClientByFd(fds[i].fd));
                 close(fds[i].fd);
                 fds.erase(fds.begin() + i);
@@ -100,17 +100,17 @@ void Server::process() {
             }
 
             buffer[bytes_received] = '\0';  // Asegurar terminación de cadena
-            std::cout << "Datos recibidos: " << buffer << std::endl;
+            std::cout << "Data received: " << buffer << std::endl;
 
             // Obtener el cliente
             Client* client = clientManager.getClientByFd(fds[i].fd);
             if (!client) {
-                std::cerr << "Error: Cliente no encontrado para fd " << fds[i].fd << std::endl;
+                std::cerr << "Error: Client not found for fd " << fds[i].fd << std::endl;
                 continue;
             }
             // Acumular datos recibidos en el cliente
             client->getPartialCommand() += buffer;
-            std::cout << "Comando parcial acumulado: " << client->getPartialCommand() << std::endl;
+            std::cout << "Partial cumulative command: " << client->getPartialCommand() << std::endl;
 
             // Procesar solo líneas completas
             size_t pos;
@@ -124,7 +124,7 @@ void Server::process() {
 
                 if (!single_command.empty()) {
                     // Manejar el comando
-                    std::cout << "Comando recibido: [" << single_command << "]" << std::endl;
+                    std::cout << "Command received: [" << single_command << "]" << std::endl;
                     commandHandler.handleCommand(*client, single_command);
                 }
             }
@@ -137,7 +137,7 @@ void Server::process() {
 
         // Manejar errores en el socket
         if (fds[i].revents & (POLLERR | POLLHUP | POLLNVAL)) {
-            std::cout << "Error en cliente " << fds[i].fd << ", cerrando conexión." << std::endl;
+            std::cout << "Client error " << fds[i].fd << ", closing connection." << std::endl;
             clientManager.removeClient(clientManager.getClientByFd(fds[i].fd));
             close(fds[i].fd);
             fds.erase(fds.begin() + i);
@@ -147,12 +147,12 @@ void Server::process() {
 }
 
 Server::~Server() {
-	std::cout << "Llamando al destructor de Server..." << std::endl;
+	std::cout << "Calling the Server destructor..." << std::endl;
 	stop();
 }
 
 void Server::stop() {
-    std::cout << "Deteniendo el servidor..." << std::endl;
+    std::cout << "Stopping the server..." << std::endl;
 
     clientManager.clearAllClients();
     
@@ -171,22 +171,22 @@ void Server::acceptClients()
 
     if (client_fd == -1)
     {
-        std::cerr << "Error al aceptar la conexión: " << strerror(errno) << std::endl;
+        std::cerr << "Error accepting connection: " << strerror(errno) << std::endl;
         return;
     }
 
     if (fds.size() >= MAX_CLIENTS)
     {
-        std::cerr << "Conexión rechazada: demasiados clientes conectados." << std::endl;
+        std::cerr << "Connection refused: too many clients connected." << std::endl;
         close(client_fd);
         return;
     }
 
-    std::cout << "Nuevo cliente conectado desde "
+    std::cout << "New customer connected from "
               << inet_ntoa(client_addr.sin_addr) << ":"
               << ntohs(client_addr.sin_port) << std::endl;
 
-    std::string password_prompt = "Ingrese la contraseña con el formato: PASS <password>\n";
+    std::string password_prompt = "Enter the password in the format: PASS <password>\n";
     send(client_fd, password_prompt.c_str(), password_prompt.size(), 0);
 
     int attempts = 0;
@@ -200,7 +200,7 @@ void Server::acceptClients()
 
         if (bytes_received <= 0)
         {
-            std::cerr << "Error al recibir la contraseña del cliente." << std::endl;
+            std::cerr << "Error receiving password from client." << std::endl;
             close(client_fd);
             return;
         }
@@ -221,13 +221,13 @@ void Server::acceptClients()
             continue;
         }
 
-        std::cout << "Recibido: [" << received_input << "]" << std::endl;
+        std::cout << "Received: [" << received_input << "]" << std::endl;
 
         // Se exige que el comando empiece exactamente con "PASS "
         if (received_input.compare(0, 5, "PASS ") != 0)
         {
             std::stringstream ss;
-            ss << "Formato incorrecto. Intentos restantes: " << (2 - attempts) << "\n";
+            ss << "Incorrect format. Remaining attempts: " << (2 - attempts) << "\n";
             std::string error_msg = ss.str();
             send(client_fd, error_msg.c_str(), error_msg.size(), 0);
             std::cerr << error_msg;
@@ -241,15 +241,15 @@ void Server::acceptClients()
         // Comparar la contraseña exactamente, sin cambios de mayúsculas/minúsculas
         if (input_password == password)
         {
-            std::cout << "Contraseña aceptada." << std::endl;
-            std::string success_msg = "Contraseña aceptada. Continúe con NICK y luego USER.\n";
+            std::cout << "Password accepted." << std::endl;
+            std::string success_msg = "Password accepted. Continue with NICK and then USER.\n";
             send(client_fd, success_msg.c_str(), success_msg.size(), 0);
             break;
         }
         else
         {
             std::stringstream ss;
-            ss << "Contraseña incorrecta. Intentos restantes: " << (2 - attempts) << "\n";
+            ss << "Incorrect password. Attempts remaining.: " << (2 - attempts) << "\n";
             std::string error_msg = ss.str();
             send(client_fd, error_msg.c_str(), error_msg.size(), 0);
             std::cerr << error_msg;
@@ -260,7 +260,7 @@ void Server::acceptClients()
 
     if (attempts >= 3)  // Se agotaron los intentos
     {
-        std::string error_msg = "ERROR: Contraseña incorrecta. Conexión cerrada.\n";
+        std::string error_msg = "ERROR: Incorrect password. Connection closed..\n";
         send(client_fd, error_msg.c_str(), error_msg.size(), 0);
         std::cerr << error_msg;
         close(client_fd);

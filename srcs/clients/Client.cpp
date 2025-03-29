@@ -6,7 +6,7 @@
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:37 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/17 20:16:13 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/29 11:02:22 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ Client::Client(int fd, sockaddr_in addr) : client_fd(fd), client_addr(addr), con
     char client_ip[INET_ADDRSTRLEN];
     inet_ntop(AF_INET, &(client_addr.sin_addr), client_ip, INET_ADDRSTRLEN);
 	connected = true;
-    std::cout << "Cliente conectado desde " << client_ip << ":" << ntohs(client_addr.sin_port) << std::endl;
+    std::cout << "Client connected from " << client_ip << ":" << ntohs(client_addr.sin_port) << std::endl;
 }
 
 Client::~Client() {

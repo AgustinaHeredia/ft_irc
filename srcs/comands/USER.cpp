@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   USER.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: patri <patri@student.42.fr>                +#+  +:+       +#+        */
+/*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/02 13:39:17 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/26 18:55:38 by patri            ###   ########.fr       */
+/*   Updated: 2025/03/29 11:51:48 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,21 +26,21 @@ void CommandHandler::handleUserCommand(Client &client, const std::string &messag
 
     std::getline(iss >> std::ws, realname); // Leer el realname
 
-    std::cout << "[DEBUG] USER recibido - Username: " << username 
+    std::cout << "[DEBUG] USER received - Username: " << username 
               << ", Hostname: " << hostname 
               << ", Servername: " << servername 
               << ", Realname: " << realname << std::endl;
 
     // Validaciones
     if (username.empty() || realname.empty()) {
-        const char* error_msg = "ERROR: Formato incorrecto de USER.\n";
+        const char* error_msg = "ERROR: Incorrect USER format.\n";
         send(client.getFd(), error_msg, strlen(error_msg), 0);
         return;
     }
 
     // Verificar que ya se haya enviado un NICK
     if (client.getNickname().empty()) {
-        const char* error_msg = "ERROR: Falta el NICK antes de USER.\n";
+        const char* error_msg = "ERROR: NICK is missing before USER.\n";
         send(client.getFd(), error_msg, strlen(error_msg), 0);
         return;
     }
@@ -52,10 +52,10 @@ void CommandHandler::handleUserCommand(Client &client, const std::string &messag
 
     // Enviar mensaje de bienvenida si la autenticación es exitosa
     if (client.isAuthenticated()) {
-        const char* welcome_msg = "Bienvenido al servidor IRC!\n";
+        const char* welcome_msg = "Welcome to the server IRC!\n";
         send(client.getFd(), welcome_msg, strlen(welcome_msg), 0);
     } else {
-        const char* warning_msg = "Warning: Falta el NICK para completar la autenticación.\n";
+        const char* warning_msg = "Warning: NICK is missing to complete authentication.\n";
         send(client.getFd(), warning_msg, strlen(warning_msg), 0);
     }
 }

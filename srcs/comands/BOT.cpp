@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   BOT.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: patri <patri@student.42.fr>                +#+  +:+       +#+        */
+/*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/02 13:40:26 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/26 16:01:08 by patri            ###   ########.fr       */
+/*   Updated: 2025/03/29 11:08:20 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ void CommandHandler::handleBot(Client &client, const std::string &message)
 {
     // Verificar autenticación del usuario
     if (!client.isAuthenticated()) {
-        const char* error_msg = "Warning: Falta completar la autenticación.\n";
+        const char* error_msg = "Warning: Authentication is missing.\n";
         send(client.getFd(), error_msg, strlen(error_msg), 0);
         return;  // Asegúrate de que la función termine aquí si no está autenticado.
     }
@@ -31,9 +31,9 @@ void CommandHandler::handleBot(Client &client, const std::string &message)
     if (message.empty()) 
     {
         const char* menu = 
-            "Opciones del Bot:\n"
-            " - !bot rps <piedra|papel|tijera> : Juega Piedra, Papel o Tijera.\n"
-            " - !bot coinflip : Lanza una moneda (cara o cruz).\n";
+            "Bot Options:\n"
+            " - !bot rps <rock|paper|scissors> : Play Rock, Paper, Scissors.\n"
+            " - !bot coinflip : Flip a coin (heads or tails).\n";
         send(client.getFd(), menu, strlen(menu), 0);
         return;
     }
@@ -50,7 +50,7 @@ void CommandHandler::handleBot(Client &client, const std::string &message)
 
         if (user_move.empty()) 
         {
-            const char* error_msg = "ERROR: Debes especificar tu jugada (piedra, papel o tijera).\n";
+            const char* error_msg = "ERROR: You must specify your move (rock, paper, scissors).\n";
             send(client.getFd(), error_msg, strlen(error_msg), 0);
             return;
         }
@@ -59,43 +59,43 @@ void CommandHandler::handleBot(Client &client, const std::string &message)
         std::transform(user_move.begin(), user_move.end(), user_move.begin(), ::tolower);
 
         // Validar la jugada
-        if (user_move != "piedra" && user_move != "papel" && user_move != "tijera") 
+        if (user_move != "rock" && user_move != "paper" && user_move != "scissors") 
         {
-            const char* error_msg = "ERROR: Jugada inválida. Usa 'piedra', 'papel' o 'tijera'.\n";
+            const char* error_msg = "ERROR: Invalid move. Use 'rock', 'paper', or 'scissors'.\n";
             send(client.getFd(), error_msg, strlen(error_msg), 0);
             return;
         }
 
         // Generar la jugada del bot (0: piedra, 1: papel, 2: tijera)
-        std::string options[3] = { "piedra", "papel", "tijera" };
+        std::string options[3] = { "rock", "paper", "scissors" };
         std::string bot_move = options[rand() % 3];
 
         // Determinar el resultado
         std::string result;
         if (user_move == bot_move) 
-            result = "Empate!";
-        else if ((user_move == "piedra" && bot_move == "tijera") ||
-                 (user_move == "papel" && bot_move == "piedra") ||
-                 (user_move == "tijera" && bot_move == "papel")) 
-            result = "Ganaste!";
+            result = "Draw!";
+        else if ((user_move == "rock" && bot_move == "scissors") ||
+                 (user_move == "paper" && bot_move == "rock") ||
+                 (user_move == "scissors" && bot_move == "paper")) 
+            result = "You won!";
         else 
-            result = "Perdiste!";
+            result = "You lost!";
 
         // Enviar respuesta al cliente
-        std::string response = "Bot: Yo escogí " + bot_move + ". " + result + "\n";
+        std::string response = "Bot: I chose " + bot_move + ". " + result + "\n";
         send(client.getFd(), response.c_str(), response.length(), 0);
     } 
     // Coinflip (cara o cruz)
     else if (subcommand == "coinflip") 
     {
-        std::string result = (rand() % 2 == 0) ? "Salió cara!" : "Salió cruz!";
+        std::string result = (rand() % 2 == 0) ? "It came up heads!" : "It came up tails!";
         std::string response = "Bot: " + result + "\n";
         send(client.getFd(), response.c_str(), response.length(), 0);
     } 
     // Subcomando no reconocido
     else
     {
-        const char* error_msg = "ERROR: Subcomando no reconocido. Usa !bot para ver las opciones.\n";
+        const char* error_msg = "ERROR: Unrecognized subcommand. Use !bot to view options.\n";
         send(client.getFd(), error_msg, strlen(error_msg), 0);
     }
 }

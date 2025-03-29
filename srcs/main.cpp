@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: patri <patri@student.42.fr>                +#+  +:+       +#+        */
+/*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 11:59:25 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/18 11:27:11 by patri            ###   ########.fr       */
+/*   Updated: 2025/03/29 11:00:33 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,19 +22,19 @@ bool g_shutdown = false;
 
 void signalHandler(int signum) {
     g_shutdown = true;
-    std::cout << "Señal recibida: " << signum << ", cerrando servidor..." << std::endl;
+    std::cout << "Signal received: " << signum << ", shutting down server..." << std::endl;
 }
 
 int main(int argc, char** argv) {
     // Validar argumentos
     if (argc != 3) {
-        std::cerr << "Uso: ./ircserv <port> <password>" << std::endl;
+        std::cerr << "Use: ./ircserv <port> <password>" << std::endl;
         return 1;
     }
 
     int port = std::atoi(argv[1]);  // Convertir argumento a entero
     if (port <= 0 || port > 65535) {
-        std::cerr << "Error: Puerto inválido. Debe estar entre 1 y 65535." << std::endl;
+        std::cerr << "Error: Invalid port. Must be between 1 and 65535." << std::endl;
         return 1;
     }
     srand(time(NULL));
@@ -54,7 +54,7 @@ int main(int argc, char** argv) {
         }
 
     } catch (const std::exception& e) {
-        std::cerr << "Error crítico: " << e.what() << std::endl;
+        std::cerr << "Critical error: " << e.what() << std::endl;
         return 1;
     }
 
