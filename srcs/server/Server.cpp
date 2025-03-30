@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
+/*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:07:11 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/29 15:55:32 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/03/30 20:39:14 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,8 @@
 #define BUFFER_SIZE 1024
 #define BACKLOG 10
 
-Server::Server(int puerto, const std::string &pwd) : port(puerto), password(pwd), commandHandler(*this)
+Server::Server(int puerto, const std::string &pwd, const Config &conf)
+    : port(puerto), password(pwd), commandHandler(*this), config(conf) 
 {}
 
 void Server::start() {
@@ -75,7 +76,8 @@ void Server::start() {
 }
 
 void Server::process() {
-    int activity = poll(&fds[0], fds.size(), -1);
+    int timeout = std::stoi(config.get("timeout", "5000")); // 5000ms por defecto
+	int activity = poll(&fds[0], fds.size(), timeout);
     if (activity == -1) {
         if (errno == EINTR) {
             std::cerr << "Interrupt signal received, closing server..." << std::endl;
@@ -100,18 +102,19 @@ void Server::process() {
 
             // Cliente se desconectó
             if (bytes_received <= 0) {
-                std::cout << "Client disconnected: " << fds[i].fd << std::endl;
-                Client* client = clientManager.getClientByFd(fds[i].fd);
-                if (client) {
-                    clientManager.removeNickname(client->getNickname());
-                }
-                clientManager.removeClient(client);
-                close(fds[i].fd);
-                fds.erase(fds.begin() + i);
-                std::cout << "Client fd " << fds[i].fd << " removed." << std::endl;
-                i--;
-                continue;
-            }
+				std::cout << "Client disconnected: " << fds[i].fd << std::endl;
+				Client* client = clientManager.getClientByFd(fds[i].fd);
+				if (client) {
+					std::cout << "Removing client: " << client->getNickname() << std::endl;
+					clientManager.removeNickname(client->getNickname());
+					clientManager.removeClient(client);
+				}
+				close(fds[i].fd);
+				std::cout << "Socket " << fds[i].fd << " closed." << std::endl;
+				fds.erase(fds.begin() + i);
+				i--;
+				continue;
+			}
 
             buffer[bytes_received] = '\0';
             std::cout << "Data received: " << buffer << std::endl;
@@ -142,11 +145,16 @@ void Server::process() {
             }
         }
 
-        // Cliente listo para escribir (por ahora no se implementa)
-        if (fds[i].revents & POLLOUT) {
-            // Manejar cola de mensajes pendientes si es necesario
-        }
-
+        // Manejar cierre de conexión (POLLHUP)
+		if (fds[i].revents & POLLHUP) {
+			std::cout << "Client " << fds[i].fd << " has closed the connection (POLLHUP)." << std::endl;
+			clientManager.removeClient(clientManager.getClientByFd(fds[i].fd));
+			close(fds[i].fd);
+			fds.erase(fds.begin() + i);
+			std::cout << "Client fd " << fds[i].fd << " removed after POLLHUP." << std::endl;
+			i--;
+		}
+		
         // Manejar errores en el socket
         if (fds[i].revents & (POLLERR | POLLHUP | POLLNVAL)) {
             std::cout << "Client error " << fds[i].fd << ", closing connection." << std::endl;
@@ -155,6 +163,7 @@ void Server::process() {
             fds.erase(fds.begin() + i);
             std::cout << "Client fd " << fds[i].fd << " closed and removed." << std::endl;
             i--;
+			continue;
         }
     }
 }
@@ -172,14 +181,18 @@ void Server::stop() {
     std::cout << "Server socket closed." << std::endl;
 
     for (size_t i = 0; i < fds.size(); ++i) {
-        close(fds[i].fd);
-        std::cout << "Closed client socket " << fds[i].fd << std::endl;
-    }
+		if (fds[i].fd == server_fd) {
+			std::cout << "Closing server socket: " << fds[i].fd << std::endl;
+		} else {
+			std::cout << "Closing client socket: " << fds[i].fd << std::endl;
+		}
+		close(fds[i].fd);
+	}
+	std::cout << "Number of connected clients: " << fds.size() - 1 << std::endl;
     fds.clear();
 }
 
-void Server::acceptClients()
-{
+void Server::acceptClients() {
     sockaddr_in client_addr;
     socklen_t client_len = sizeof(client_addr);
     int client_fd = accept(server_fd, (struct sockaddr*)&client_addr, &client_len);
@@ -199,95 +212,124 @@ void Server::acceptClients()
         return;
     }
 
+    // Enviar el mensaje de solicitud de contraseña inmediatamente
     std::string password_prompt = "Enter the password in the format: PASS <password>\n";
     send(client_fd, password_prompt.c_str(), password_prompt.size(), 0);
+    std::cout << "Password prompt sent to client." << std::endl;
 
-    int attempts = 0;
-    std::string received_input;
-    char buffer[256];
+    // Declarar e inicializar buffer
+    char buffer[BUFFER_SIZE];
+    memset(buffer, 0, sizeof(buffer));
+
+    // Leer sin consumir datos para detectar "CAP LS" o la contraseña
+    char peek_buffer[256];
+    memset(peek_buffer, 0, sizeof(peek_buffer));
+    ssize_t peek_bytes = recv(client_fd, peek_buffer, sizeof(peek_buffer) - 1, MSG_PEEK);
+
     bool password_ok = false;
 
-    while (attempts < 3) { // Permitir 3 intentos
-        memset(buffer, 0, sizeof(buffer));
-        ssize_t bytes_received = recv(client_fd, buffer, sizeof(buffer) - 1, 0);
+    if (peek_bytes > 0) {
+        std::string initial_data(peek_buffer, peek_bytes);
+        std::cout << "Initial data received: " << initial_data << std::endl;
 
-        if (bytes_received <= 0) {
-            std::cerr << "Error receiving password from client." << std::endl;
-            close(client_fd);
-            return;
+        // Responder a "CAP LS" si está presente
+        if (initial_data.find("CAP LS") != std::string::npos) {
+            std::string cap_response = "CAP * LS :\r\n";
+            send(client_fd, cap_response.c_str(), cap_response.size(), 0);
+            std::cout << "Responding to CAP LS before password check." << std::endl;
         }
 
-        buffer[bytes_received] = '\0';
-        received_input = buffer;
-
-        // Procesar línea por línea
-        std::stringstream ss_input(received_input);
-        std::string line;
-        while (std::getline(ss_input, line)) {
-            // Limpiar saltos de línea y espacios
-            while (!line.empty() && (line[line.size() - 1] == '\r' || line[line.size() - 1] == '\n'))
-                line.erase(line.size() - 1);
-            while (!line.empty() && (line[0] == ' ' || line[0] == '\t'))
-                line.erase(0, 1);
-            if (line.empty())
-                continue;
-
-            std::cout << "Received: [" << line << "]" << std::endl;
-
-            // Manejar CAP LS para Irssi
-            if (line.compare(0, 6, "CAP LS") == 0) {
-                std::string cap_response = "CAP * LS :\r\n";
-                send(client_fd, cap_response.c_str(), cap_response.size(), 0);
-                std::cout << "Responding to CAP LS" << std::endl;
-                continue;
-            }
-
-            // Verificar que la línea comience con "PASS "
-            if (line.compare(0, 5, "PASS ") != 0) {
-                std::stringstream ss_error;
-                ss_error << "Incorrect format. Remaining attempts: " << (2 - attempts) << "\n";
-                std::string error_msg = ss_error.str();
-                send(client_fd, error_msg.c_str(), error_msg.size(), 0);
-                std::cerr << error_msg;
-                attempts++;
-                continue;
-            }
-
-            // Extraer la contraseña enviada
-            std::string input_password = line.substr(5);
+        // Verificar si la contraseña está incluida en los datos iniciales
+        if (initial_data.find("PASS ") == 0) {
+            std::string input_password = initial_data.substr(5);
+            input_password.erase(input_password.find_last_not_of(" \r\n") + 1); // Limpiar espacios y saltos de línea
             if (input_password == password) {
-                std::cout << "Password accepted." << std::endl;
+                std::cout << "Password accepted from initial data." << std::endl;
                 std::string success_msg = "Password accepted. Continue with NICK and then USER.\n";
                 send(client_fd, success_msg.c_str(), success_msg.size(), 0);
                 password_ok = true;
-                break;
             } else {
-                std::stringstream ss;
-                ss << "Incorrect password. Attempts remaining: " << (2 - attempts) << "\n";
-                std::string error_msg = ss.str();
+                std::string error_msg = "ERROR: Incorrect password. Connection closed.\n";
                 send(client_fd, error_msg.c_str(), error_msg.size(), 0);
                 std::cerr << error_msg;
-                attempts++;
-                continue;
+                close(client_fd);
+                return;
             }
         }
-        if (password_ok)
-            break;
     }
 
+    // Si la contraseña no se validó en los datos iniciales, solicitarla explícitamente
     if (!password_ok) {
-        std::string error_msg = "ERROR: Incorrect password. Connection closed.\n";
-        send(client_fd, error_msg.c_str(), error_msg.size(), 0);
-        std::cerr << error_msg;
-        close(client_fd);
-        return;
+        int attempts = 0;
+        std::string received_input;
+
+        while (attempts < 3) {
+            memset(buffer, 0, sizeof(buffer));
+            ssize_t bytes_received = recv(client_fd, buffer, sizeof(buffer) - 1, 0);
+
+            if (bytes_received <= 0) {
+                std::cerr << "Error receiving password from client." << std::endl;
+                close(client_fd);
+                return;
+            }
+
+            buffer[bytes_received] = '\0';
+            received_input = buffer;
+
+            std::stringstream ss_input(received_input);
+            std::string line;
+            while (std::getline(ss_input, line)) {
+                while (!line.empty() && (line[line.size() - 1] == '\r' || line[line.size() - 1] == '\n'))
+                    line.erase(line.size() - 1);
+                while (!line.empty() && (line[0] == ' ' || line[0] == '\t'))
+                    line.erase(0, 1);
+                if (line.empty())
+                    continue;
+
+                std::cout << "Received: [" << line << "]" << std::endl;
+
+                if (line.compare(0, 5, "PASS ") != 0) {
+                    std::stringstream ss_error;
+                    ss_error << "Incorrect format. Remaining attempts: " << (2 - attempts) << "\n";
+                    std::string error_msg = ss_error.str();
+                    send(client_fd, error_msg.c_str(), error_msg.size(), 0);
+                    std::cerr << error_msg;
+                    attempts++;
+                    continue;
+                }
+
+                std::string input_password = line.substr(5);
+                if (input_password == password) {
+                    std::cout << "Password accepted." << std::endl;
+                    std::string success_msg = "Password accepted. Continue with NICK and then USER.\n";
+                    send(client_fd, success_msg.c_str(), success_msg.size(), 0);
+                    password_ok = true;
+                    break;
+                } else {
+                    std::stringstream ss;
+                    ss << "Incorrect password. Attempts remaining: " << (2 - attempts) << "\n";
+                    std::string error_msg = ss.str();
+                    send(client_fd, error_msg.c_str(), error_msg.size(), 0);
+                    std::cerr << error_msg;
+                    attempts++;
+                    continue;
+                }
+            }
+            if (password_ok)
+                break;
+        }
+
+        if (!password_ok) {
+            std::string error_msg = "ERROR: Incorrect password. Connection closed.\n";
+            send(client_fd, error_msg.c_str(), error_msg.size(), 0);
+            std::cerr << error_msg;
+            close(client_fd);
+            return;
+        }
     }
 
-    // Limpiar input residual
-    while (recv(client_fd, buffer, sizeof(buffer) - 1, MSG_DONTWAIT) > 0)
-        ;
+    while (recv(client_fd, buffer, sizeof(buffer) - 1, MSG_DONTWAIT) > 0);
 
-    // Crear y almacenar el nuevo cliente, marcándolo como autenticado
     Client* new_client = new Client(client_fd, client_addr);
     new_client->markAsAuthenticated(true);
     pollfd client_pollfd;
@@ -305,4 +347,34 @@ ClientManager &Server::getClientManager() {
 
 ChannelManager &Server::getChannelManager() {
     return channelManager;
+}
+
+void Server::sendReply(const std::string &code, Client &client, const std::vector<std::string> &params) {
+    std::string message;
+
+    // Generar el mensaje basado en el código
+    if (code == Reply::RPL_WELCOME) {
+        message = Reply::RPL_WELCOME + " " + client.getNickname() + " " + Reply::r_RPL_WELCOME(params) + "\r\n";
+    } else if (code == Reply::RPL_NOTOPIC) {
+        message = Reply::RPL_NOTOPIC + " " + client.getNickname() + " " + Reply::r_RPL_NOTOPIC(params) + "\r\n";
+    } else if (code == Reply::RPL_TOPIC) {
+        message = Reply::RPL_TOPIC + " " + client.getNickname() + " " + Reply::r_RPL_TOPIC(params) + "\r\n";
+    } else if (code == Reply::RPL_NAMREPLY) {
+        message = Reply::RPL_NAMREPLY + " " + client.getNickname() + " " + Reply::r_RPL_NAMREPLY(params) + "\r\n";
+    } else if (code == Reply::RPL_ENDOFNAMES) {
+        message = Reply::RPL_ENDOFNAMES + " " + client.getNickname() + " " + Reply::r_RPL_ENDOFNAMES(params) + "\r\n";
+    } else if (code == Reply::ERR_UNKNOWNCOMMAND) {
+        message = Reply::ERR_UNKNOWNCOMMAND + " " + client.getNickname() + " " + Reply::r_ERR_UNKNOWNCOMMAND(params) + "\r\n";
+    } else if (code == Reply::ERR_NEEDMOREPARAMS) {
+        message = Reply::ERR_NEEDMOREPARAMS + " " + client.getNickname() + " " + Reply::r_ERR_NEEDMOREPARAMS(params) + "\r\n";
+    } else if (code == Reply::ERR_NICKNAMEINUSE) {
+        message = Reply::ERR_NICKNAMEINUSE + " " + client.getNickname() + " " + Reply::r_ERR_NICKNAMEINUSE(params) + "\r\n";
+    } else {
+        std::cerr << "Unknown reply code: " << code << std::endl;
+        return;
+    }
+
+    // Enviar el mensaje al cliente
+    send(client.getFd(), message.c_str(), message.size(), 0);
+    std::cout << "Sent reply: " << message;
 }

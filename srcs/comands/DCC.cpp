@@ -6,7 +6,7 @@
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 20:14:46 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/29 10:57:52 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/30 17:15:07 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@
 #include <cstdlib>
 #include <cstdio>
 #include <cerrno>
+#undef FILE
 
 void CommandHandler::handleDccSend(Server &srv, Client &sender, const std::string &msg) {
     std::istringstream iss(msg);
@@ -82,7 +83,9 @@ void CommandHandler::handleDccSend(Server &srv, Client &sender, const std::strin
         std::cerr << "[DCC] Error al poner en escucha: " << strerror(errno) << std::endl;
         close(file_sock);
         return;
-    }
+    } else {
+		std::cout << "[DCC] Socket en escucha en el puerto " << port << std::endl;
+	}
 
     std::cout << "[DCC] Esperando conexión en el puerto " << port << " para el archivo " << filename << std::endl;
 
@@ -104,18 +107,23 @@ void CommandHandler::handleDccSend(Server &srv, Client &sender, const std::strin
     std::cout << "[DCC] Conexión establecida con " << inet_ntoa(client_addr.sin_addr) << std::endl;
 
     // Abrir archivo
-    FILE *file = fopen(filename.c_str(), "rb");
+    std::FILE *file = fopen(filename.c_str(), "rb");
     if (!file) {
-        std::cerr << "[DCC] Error al abrir el archivo." << std::endl;
-        close(client_fd);
-        return;
+        std::cerr << "[DCC] Error al abrir el archivo: " << strerror(errno) << std::endl;
+    	close(client_fd);
+   		close(file_sock);
+    	return;
     }
 
     char buffer[4096];
     size_t bytes_read;
     while ((bytes_read = fread(buffer, 1, sizeof(buffer), file)) > 0) {
-        send(client_fd, buffer, bytes_read, 0);
-    }
+		ssize_t bytes_sent = send(client_fd, buffer, bytes_read, 0);
+		if (bytes_sent == -1) {
+			std::cerr << "[DCC] Error al enviar datos: " << strerror(errno) << std::endl;
+			break;
+		}
+	}
 
     std::cout << "[DCC] Archivo " << filename << " enviado a " << target_nick << std::endl;
 
@@ -138,7 +146,22 @@ void CommandHandler::handleDccAccept(Server& srv, Client& receiver, const std::s
         return;
     }
 
-    std::cout << "[DCC] " << receiver.getNickname() << " ha aceptado la transferencia de " << filename << std::endl;
+    std::cout << "[DEBUG] port_str: " << port_str << std::endl;
+
+    // Verificar si port_str está vacío
+    if (port_str.empty()) {
+        const char* error_msg = "ERROR: Puerto no especificado.\n";
+        send(receiver.getFd(), error_msg, strlen(error_msg), 0);
+        return;
+    }
+
+    // Validar que port_str sea numérico
+    bool isNumber = !port_str.empty() && std::all_of(port_str.begin(), port_str.end(), ::isdigit);
+    if (!isNumber) {
+        const char* error_msg = "ERROR: Puerto inválido (no numérico).\n";
+        send(receiver.getFd(), error_msg, strlen(error_msg), 0);
+        return;
+    }
 
     // Convertir puerto
     char* end_ptr;
@@ -149,10 +172,15 @@ void CommandHandler::handleDccAccept(Server& srv, Client& receiver, const std::s
         return;
     }
 
+    std::cout << "[DEBUG] Puerto válido: " << port << std::endl;
+
+
     // Convertir IP
     const std::string& ip_str = receiver.getPartialCommand();
     in_addr_t ip = inet_addr(ip_str.c_str());
     if (ip == INADDR_NONE) {
+		std::cout << "[DEBUG] Mensaje recibido: " << msg << std::endl;
+		std::cout << "[DEBUG] port_str: " << port_str << std::endl;
         const char* error_msg = "ERROR: IP inválida.\n";
         send(receiver.getFd(), error_msg, strlen(error_msg), 0);
         return;
@@ -174,12 +202,14 @@ void CommandHandler::handleDccAccept(Server& srv, Client& receiver, const std::s
         std::cerr << "[DCC] Error al conectarse con el remitente." << std::endl;
         close(sock);
         return;
-    }
+    } else {
+		std::cout << "[DCC] Conexión establecida con el remitente en " << ip_str << ":" << port << std::endl;
+	}
 
     // Crear archivo
     int file_fd = open(filename.c_str(), O_WRONLY | O_CREAT, 0644);
     if (file_fd == -1) {
-        std::cerr << "[DCC] Error al abrir archivo para escritura." << std::endl;
+        std::cerr << "[DCC] Error al abrir archivo para escritura: " << strerror(errno) << std::endl;
         close(sock);
         return;
     }

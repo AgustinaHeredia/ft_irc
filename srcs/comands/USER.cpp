@@ -6,7 +6,7 @@
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/02 13:39:17 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/29 11:51:48 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/30 17:32:50 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,8 +52,8 @@ void CommandHandler::handleUserCommand(Client &client, const std::string &messag
 
     // Enviar mensaje de bienvenida si la autenticación es exitosa
     if (client.isAuthenticated()) {
-        const char* welcome_msg = "Welcome to the server IRC!\n";
-        send(client.getFd(), welcome_msg, strlen(welcome_msg), 0);
+        std::string welcome_msg = ":127.0.0.1 001 " + client.getNickname() + " :Welcome to the IRC server\r\n";
+        send(client.getFd(), welcome_msg.c_str(), welcome_msg.size(), 0);
     } else {
         const char* warning_msg = "Warning: NICK is missing to complete authentication.\n";
         send(client.getFd(), warning_msg, strlen(warning_msg), 0);

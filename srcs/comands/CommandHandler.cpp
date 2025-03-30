@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CommandHandler.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
+/*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:14 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/29 16:13:45 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/03/30 20:49:30 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,13 @@
 CommandHandler::CommandHandler(Server &srv) : server(srv) {}
 
 void CommandHandler::handleCommand(Client& client, const std::string& command) {
+
+	// Verificar si el cliente aún existe en el ClientManager
+    if (!server.getClientManager().isClientValid(&client)) {
+        std::cout << "Client no longer exists. Ignoring command: " << command << std::endl;
+        return;
+    }
+	
     // Solo procesamos comandos si el cliente está autenticado
     if (!client.isAuthenticated()) {
         std::cout << "Client not authenticated. Ignoring command: " << command << std::endl;
@@ -46,6 +53,7 @@ void CommandHandler::handleCommand(Client& client, const std::string& command) {
     } else if (cmd == "QUIT") {
         std::cout << "QUIT command received" << std::endl;
         server.getClientManager().removeClient(&client);
+		return;
     } else if (cmd == "PRIVMSG") {
         std::string message;
         std::getline(iss, message);
@@ -101,7 +109,15 @@ void CommandHandler::handleCommand(Client& client, const std::string& command) {
         std::string cap_end_response = "CAP END\r\n";
         send(client.getFd(), cap_end_response.c_str(), cap_end_response.size(), 0);
         std::cout << "Responding to CAP END" << std::endl;
-    } else {
+    } else if (cmd == "PING") {
+		std::string params;
+        std::getline(iss, params);
+		params.erase(0, params.find_first_not_of(" \t\r\n"));
+		std::string response = "PONG " + params + "\r\n";
+		send(client.getFd(), response.c_str(), response.size(), 0);
+		std::cout << "Responded to PING: " << response;
+		return;
+	} else {
         std::cout << "Unknown command." << std::endl;
         const char* warning_msg = "Warning: Unknown command.\n";
         send(client.getFd(), warning_msg, strlen(warning_msg), 0);

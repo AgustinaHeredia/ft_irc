@@ -6,7 +6,7 @@
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/02 18:20:12 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/29 13:34:24 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/30 17:58:57 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,4 +64,8 @@ void ClientManager::clearAllClients() {
     }
     clients.clear();
 	nicknames.clear();
+}
+
+bool ClientManager::isClientValid(Client* client) const {
+    return std::find(clients.begin(), clients.end(), client) != clients.end();
 }

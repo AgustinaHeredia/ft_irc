@@ -6,12 +6,13 @@
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 11:59:25 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/29 11:00:33 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/30 17:16:04 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "utils/utils.hpp"
 #include "server/Server.hpp"
+#include "server/Config.hpp"
 #include <iostream>
 #include <csignal>
 #include <ctime>
@@ -46,8 +47,9 @@ int main(int argc, char** argv) {
     signal(SIGTERM, signalHandler);
 
     try {
-        Server server(port, password);
-        server.start();
+        Config config;
+		Server server(port, password, config);
+		server.start();
 
         while (!g_shutdown) {
             server.process();

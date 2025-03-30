@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
+/*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:42 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/29 15:40:03 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/03/30 19:57:55 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,9 @@
 # include "../comands/CommandHandler.hpp"
 # include "ClientManager.hpp"
 # include "ChannelManager.hpp"
+# include "Config.hpp"
+# include "Reply.hpp"
+# include "../utils/utils.hpp"
 
 # define MAX_CLIENTS 10
 
@@ -39,15 +42,21 @@ class Server {
     	ChannelManager channelManager;
 	
 		void acceptClients();
+
+		const Config &config;
 		
 	public:
-		Server(int port, const std::string& password);
+		Server(int puerto, const std::string &pwd, const Config &conf);
 		~Server();
 		void start();
 		void stop();
 		void process();
 		ClientManager &getClientManager(); // Método para obtener el ClientManager
     	ChannelManager &getChannelManager(); // Método para obtener el ChannelManager
+
+		Config	&getConfig(void);
+		
+		void sendReply(const std::string &code, Client &client, const std::vector<std::string> &params);
 };
 
 #endif
