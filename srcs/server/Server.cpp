@@ -6,7 +6,7 @@
 /*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:07:11 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/30 20:39:14 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/30 21:38:36 by agusheredia      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -212,16 +212,13 @@ void Server::acceptClients() {
         return;
     }
 
-    // Enviar el mensaje de solicitud de contraseña inmediatamente
     std::string password_prompt = "Enter the password in the format: PASS <password>\n";
     send(client_fd, password_prompt.c_str(), password_prompt.size(), 0);
     std::cout << "Password prompt sent to client." << std::endl;
 
-    // Declarar e inicializar buffer
     char buffer[BUFFER_SIZE];
     memset(buffer, 0, sizeof(buffer));
 
-    // Leer sin consumir datos para detectar "CAP LS" o la contraseña
     char peek_buffer[256];
     memset(peek_buffer, 0, sizeof(peek_buffer));
     ssize_t peek_bytes = recv(client_fd, peek_buffer, sizeof(peek_buffer) - 1, MSG_PEEK);
@@ -232,33 +229,25 @@ void Server::acceptClients() {
         std::string initial_data(peek_buffer, peek_bytes);
         std::cout << "Initial data received: " << initial_data << std::endl;
 
-        // Responder a "CAP LS" si está presente
         if (initial_data.find("CAP LS") != std::string::npos) {
             std::string cap_response = "CAP * LS :\r\n";
             send(client_fd, cap_response.c_str(), cap_response.size(), 0);
             std::cout << "Responding to CAP LS before password check." << std::endl;
         }
 
-        // Verificar si la contraseña está incluida en los datos iniciales
-        if (initial_data.find("PASS ") == 0) {
-            std::string input_password = initial_data.substr(5);
-            input_password.erase(input_password.find_last_not_of(" \r\n") + 1); // Limpiar espacios y saltos de línea
+        size_t pass_pos = initial_data.find("PASS ");
+        if (pass_pos != std::string::npos) {
+            std::string input_password = initial_data.substr(pass_pos + 5);
+            input_password.erase(input_password.find_last_not_of(" \r\n") + 1);
             if (input_password == password) {
                 std::cout << "Password accepted from initial data." << std::endl;
                 std::string success_msg = "Password accepted. Continue with NICK and then USER.\n";
                 send(client_fd, success_msg.c_str(), success_msg.size(), 0);
                 password_ok = true;
-            } else {
-                std::string error_msg = "ERROR: Incorrect password. Connection closed.\n";
-                send(client_fd, error_msg.c_str(), error_msg.size(), 0);
-                std::cerr << error_msg;
-                close(client_fd);
-                return;
             }
         }
     }
 
-    // Si la contraseña no se validó en los datos iniciales, solicitarla explícitamente
     if (!password_ok) {
         int attempts = 0;
         std::string received_input;
@@ -288,32 +277,27 @@ void Server::acceptClients() {
 
                 std::cout << "Received: [" << line << "]" << std::endl;
 
-                if (line.compare(0, 5, "PASS ") != 0) {
-                    std::stringstream ss_error;
-                    ss_error << "Incorrect format. Remaining attempts: " << (2 - attempts) << "\n";
-                    std::string error_msg = ss_error.str();
-                    send(client_fd, error_msg.c_str(), error_msg.size(), 0);
-                    std::cerr << error_msg;
-                    attempts++;
-                    continue;
+                if (line.compare(0, 5, "PASS ") == 0) {
+                    std::string input_password = line.substr(5);
+                    if (input_password == password) {
+                        std::cout << "Password accepted." << std::endl;
+                        std::string success_msg = "Password accepted. Continue with NICK and then USER.\n";
+                        send(client_fd, success_msg.c_str(), success_msg.size(), 0);
+                        password_ok = true;
+                        break;
+                    } else {
+                        std::stringstream ss;
+                        ss << "Incorrect password. Attempts remaining: " << (2 - attempts) << "\n";
+                        std::string error_msg = ss.str();
+                        send(client_fd, error_msg.c_str(), error_msg.size(), 0);
+                        std::cerr << error_msg;
+                        attempts++;
+                        continue;
+                    }
                 }
 
-                std::string input_password = line.substr(5);
-                if (input_password == password) {
-                    std::cout << "Password accepted." << std::endl;
-                    std::string success_msg = "Password accepted. Continue with NICK and then USER.\n";
-                    send(client_fd, success_msg.c_str(), success_msg.size(), 0);
-                    password_ok = true;
-                    break;
-                } else {
-                    std::stringstream ss;
-                    ss << "Incorrect password. Attempts remaining: " << (2 - attempts) << "\n";
-                    std::string error_msg = ss.str();
-                    send(client_fd, error_msg.c_str(), error_msg.size(), 0);
-                    std::cerr << error_msg;
-                    attempts++;
-                    continue;
-                }
+                // Ignorar otros comandos sin descontar intentos
+                std::cout << "Ignoring non-PASS command: " << line << std::endl;
             }
             if (password_ok)
                 break;
