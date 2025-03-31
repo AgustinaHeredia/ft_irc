@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/02 18:21:47 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/15 10:46:57 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/03/31 16:32:01 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,4 +32,12 @@ Channel* ChannelManager::getChannelByName(const std::string &name) {
         }
     }
     return NULL;
+}
+
+void ChannelManager::removeClientFromChannels(Client* client) {
+    for (std::vector<Channel>::iterator it = channels.begin(); it != channels.end(); ++it) {
+        if (it->isClientInChannel(*client)) {
+            it->removeClient(*client);
+        }
+    }
 }

@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:07:11 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/31 14:54:18 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/03/31 16:32:56 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,6 +112,7 @@ void Server::process() {
 				Client* client = clientManager.getClientByFd(fds[i].fd);
 				if (client) {
 					std::cout << "Removing client: " << client->getNickname() << std::endl;
+					channelManager.removeClientFromChannels(client);
 					clientManager.removeNickname(client->getNickname());
 					clientManager.removeClient(client);
 				}

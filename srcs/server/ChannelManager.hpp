@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/02 18:21:30 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/15 10:48:58 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/03/31 16:25:25 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ class ChannelManager {
 		void addChannel(const Channel &channel);
 		void removeChannel(const std::string &channelName);
 		Channel* getChannelByName(const std::string &name);
+		void removeClientFromChannels(Client *client);
 	
 };
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
+/*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:27 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/29 11:01:55 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/31 16:27:29 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,9 +28,9 @@ void Channel::addClient(Client& client) {
 }
 
 void Channel::removeClient(Client &client) {
-    clients.erase(std::remove(clients.begin(), clients.end(), &client), clients.end());
     std::string goodbye_msg = client.getNickname() + " has left the channel " + name + ".\n";
     broadcast(goodbye_msg);
+    clients.erase(std::remove(clients.begin(), clients.end(), &client), clients.end());
 }
 
 void Channel::broadcast(const std::string& message) {
