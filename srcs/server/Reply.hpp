@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Reply.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
+/*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/30 18:54:51 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/30 19:49:14 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/31 19:28:50 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ namespace Reply {
     static const std::string ERR_UNKNOWNCOMMAND = "421";
     static const std::string ERR_NEEDMOREPARAMS = "461";
     static const std::string ERR_NICKNAMEINUSE = "433";
+    static const std::string ERR_NOTREGISTERED = "451";
 
     // Funciones para generar respuestas
     std::string r_RPL_WELCOME(const std::vector<std::string> &av);
@@ -36,5 +37,6 @@ namespace Reply {
     std::string r_ERR_UNKNOWNCOMMAND(const std::vector<std::string> &av);
     std::string r_ERR_NEEDMOREPARAMS(const std::vector<std::string> &av);
     std::string r_ERR_NICKNAMEINUSE(const std::vector<std::string> &av);
+    std::string r_ERR_NOTREGISTERED(const std::vector<std::string> &av);
 }
 #endif

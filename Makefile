@@ -13,20 +13,20 @@ SRC = $(SRC_DIR)/main.cpp \
 	$(SRC_DIR)/server/Reply.cpp \
 	$(SRC_DIR)/channel/Channel.cpp \
 	$(SRC_DIR)/clients/Client.cpp \
-	$(SRC_DIR)/comands/CommandHandler.cpp \
-	$(SRC_DIR)/comands/NICK.cpp \
-	$(SRC_DIR)/comands/USER.cpp \
-	$(SRC_DIR)/comands/PRIVMSG.cpp \
-	$(SRC_DIR)/comands/JOIN.cpp \
-	$(SRC_DIR)/comands/PART.cpp \
-	$(SRC_DIR)/comands/KICK.cpp \
-	$(SRC_DIR)/comands/TOPIC.cpp \
-	$(SRC_DIR)/comands/MODE.cpp \
-	$(SRC_DIR)/comands/INVITE.cpp \
-	$(SRC_DIR)/comands/WHO.cpp \
-	$(SRC_DIR)/comands/NOTICE.cpp \
-	$(SRC_DIR)/comands/BOT.cpp \
-	$(SRC_DIR)/comands/DCC.cpp \
+	$(SRC_DIR)/commands/CommandHandler.cpp \
+	$(SRC_DIR)/commands/NICK.cpp \
+	$(SRC_DIR)/commands/USER.cpp \
+	$(SRC_DIR)/commands/PRIVMSG.cpp \
+	$(SRC_DIR)/commands/JOIN.cpp \
+	$(SRC_DIR)/commands/PART.cpp \
+	$(SRC_DIR)/commands/KICK.cpp \
+	$(SRC_DIR)/commands/TOPIC.cpp \
+	$(SRC_DIR)/commands/MODE.cpp \
+	$(SRC_DIR)/commands/INVITE.cpp \
+	$(SRC_DIR)/commands/WHO.cpp \
+	$(SRC_DIR)/commands/NOTICE.cpp \
+	$(SRC_DIR)/commands/BOT.cpp \
+	$(SRC_DIR)/commands/DCC.cpp \
 	$(INC_DIR)/utils.cpp 
 
 

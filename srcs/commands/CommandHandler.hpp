@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CommandHandler.hpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
+/*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:09 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/19 20:23:29 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/31 19:33:38 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ class CommandHandler {
 		void handleCommand(Client &client, const std::string &command);
 
 		void handleNickCommand(Server &srv, Client &client, const std::string &nick);
-		void handleUserCommand(Client &client, const std::string &user);
+		void handleUserCommand(Server& server, Client &client, const std::string &message);
 		void handlePrivmsg(Server &srv, Client &client, const std::string &message);
 		void handleJoin(Server &srv, Client &client, const std::string &channel_name);
 		void handlePart(Server &srv, Client &client, const std::string &channel_name);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CommandHandler.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
+/*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:14 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/30 20:49:30 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/31 19:36:17 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,9 +29,10 @@ void CommandHandler::handleCommand(Client& client, const std::string& command) {
         return;
     }
 	
-    // Solo procesamos comandos si el cliente está autenticado
-    if (!client.isAuthenticated()) {
-        std::cout << "Client not authenticated. Ignoring command: " << command << std::endl;
+    if (client.getAuthState() != Client::AUTH_COMPLETE) {
+        std::vector<std::string> params;
+        params.push_back("Authentication required");
+        server.sendReply(Reply::ERR_NOTREGISTERED, client, params);
         return;
     }
 
@@ -49,7 +50,7 @@ void CommandHandler::handleCommand(Client& client, const std::string& command) {
     } else if (cmd == "USER") {
         std::string user;
         std::getline(iss, user);
-        handleUserCommand(client, user);
+        handleUserCommand(server, client, user);
     } else if (cmd == "QUIT") {
         std::cout << "QUIT command received" << std::endl;
         server.getClientManager().removeClient(&client);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
+/*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:42 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/30 19:57:55 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/31 19:25:39 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@
 # include <poll.h>  // Necesario para manejar poll()
 # include "../clients/Client.hpp"
 # include "../channel/Channel.hpp"
-# include "../comands/CommandHandler.hpp"
+# include "../commands/CommandHandler.hpp"
 # include "ClientManager.hpp"
 # include "ChannelManager.hpp"
 # include "Config.hpp"
@@ -57,6 +57,13 @@ class Server {
 		Config	&getConfig(void);
 		
 		void sendReply(const std::string &code, Client &client, const std::vector<std::string> &params);
+		void disconnectClient(Client& client, const std::string& reason);
+		void handleAuthCommands(Client& client, const std::string& command);
+		void handleClientDisconnection(size_t index);
+		void processClientCommands(Client* client, const char* buffer);
+		void handlePassword(Client& client, const std::string& pass);
+
+		bool isCommand(const std::string& input, const char* cmd);
 };
 
 #endif

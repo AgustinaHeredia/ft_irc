@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Reply.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
+/*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/30 18:54:48 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/30 20:25:36 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/31 19:31:11 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,5 +51,9 @@ namespace Reply {
     std::string r_ERR_NICKNAMEINUSE(const std::vector<std::string> &av) {
         if (av.empty()) return "433 * :Nickname is already in use";
         return "433 " + av[0] + " :Nickname is already in use";
+    }
+    std::string r_ERR_NOTREGISTERED(const std::vector<std::string> &av) {
+        if (av.empty()) return "451 * :You have not registered (PASS/NICK/USER required)";
+        return "451 " + av[0] + " :You have not registered (PASS/NICK/USER required)";
     }
 }
