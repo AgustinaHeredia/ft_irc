@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   DCC.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
+/*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 20:14:46 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/30 17:15:07 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/03/31 14:57:00 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,7 +156,15 @@ void CommandHandler::handleDccAccept(Server& srv, Client& receiver, const std::s
     }
 
     // Validar que port_str sea numérico
-    bool isNumber = !port_str.empty() && std::all_of(port_str.begin(), port_str.end(), ::isdigit);
+    bool isNumber = true;
+    for (std::string::const_iterator it = port_str.begin(); it != port_str.end(); ++it)
+    {
+        if (!std::isdigit(*it))
+        {
+            isNumber = false;
+            break;
+        }
+    }
     if (!isNumber) {
         const char* error_msg = "ERROR: Puerto inválido (no numérico).\n";
         send(receiver.getFd(), error_msg, strlen(error_msg), 0);
