@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 20:14:46 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/31 14:57:00 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/01 16:33:30 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ void CommandHandler::handleDccSend(Server &srv, Client &sender, const std::strin
     iss >> send_cmd >> filename >> ip_str >> port_str >> size_str;
 
     if (send_cmd != "SEND") {
-        const char* error_msg = "ERROR: Formato incorrecto de DCC SEND.\n";
+        const char* error_msg = "ERROR: Formato incorrecto de DCC SEND.\r\n";
         send(sender.getFd(), error_msg, strlen(error_msg), 0);
         return;
     }
@@ -41,7 +41,7 @@ void CommandHandler::handleDccSend(Server &srv, Client &sender, const std::strin
     std::string target_nick = sender.getPartialCommand();
     Client* recipient = srv.getClientManager().getClientByNickname(target_nick);
     if (!recipient) {
-        const char* error_msg = "ERROR: Usuario destinatario no encontrado.\n";
+        const char* error_msg = "ERROR: Usuario destinatario no encontrado.\r\n";
         send(sender.getFd(), error_msg, strlen(error_msg), 0);
         return;
     }
@@ -91,7 +91,7 @@ void CommandHandler::handleDccSend(Server &srv, Client &sender, const std::strin
 
     // Notificar al destinatario
     std::string dcc_msg = ":" + sender.getNickname() + " PRIVMSG " + target_nick +
-                          " :DCC SEND " + filename + " " + ip_str + " " + port_str + " " + size_str + "\n";
+                          " :DCC SEND " + filename + " " + ip_str + " " + port_str + " " + size_str + "\r\n";
     send(recipient->getFd(), dcc_msg.c_str(), dcc_msg.size(), 0);
 
     // Aceptar conexión
@@ -141,7 +141,7 @@ void CommandHandler::handleDccAccept(Server& srv, Client& receiver, const std::s
 
     (void)srv;
     if (accept != "ACCEPT") {
-        const char* error_msg = "ERROR: Formato incorrecto de DCC ACCEPT.\n";
+        const char* error_msg = "ERROR: Formato incorrecto de DCC ACCEPT.\r\n";
         send(receiver.getFd(), error_msg, strlen(error_msg), 0);
         return;
     }
@@ -150,7 +150,7 @@ void CommandHandler::handleDccAccept(Server& srv, Client& receiver, const std::s
 
     // Verificar si port_str está vacío
     if (port_str.empty()) {
-        const char* error_msg = "ERROR: Puerto no especificado.\n";
+        const char* error_msg = "ERROR: Puerto no especificado.\r\n";
         send(receiver.getFd(), error_msg, strlen(error_msg), 0);
         return;
     }
@@ -166,7 +166,7 @@ void CommandHandler::handleDccAccept(Server& srv, Client& receiver, const std::s
         }
     }
     if (!isNumber) {
-        const char* error_msg = "ERROR: Puerto inválido (no numérico).\n";
+        const char* error_msg = "ERROR: Puerto inválido (no numérico).\r\n";
         send(receiver.getFd(), error_msg, strlen(error_msg), 0);
         return;
     }
@@ -175,7 +175,7 @@ void CommandHandler::handleDccAccept(Server& srv, Client& receiver, const std::s
     char* end_ptr;
     long port = strtol(port_str.c_str(), &end_ptr, 10);
     if (*end_ptr != '\0' || port <= 0 || port > 65535) {
-        const char* error_msg = "ERROR: Puerto inválido.\n";
+        const char* error_msg = "ERROR: Puerto inválido.\r\n";
         send(receiver.getFd(), error_msg, strlen(error_msg), 0);
         return;
     }
@@ -189,7 +189,7 @@ void CommandHandler::handleDccAccept(Server& srv, Client& receiver, const std::s
     if (ip == INADDR_NONE) {
 		std::cout << "[DEBUG] Mensaje recibido: " << msg << std::endl;
 		std::cout << "[DEBUG] port_str: " << port_str << std::endl;
-        const char* error_msg = "ERROR: IP inválida.\n";
+        const char* error_msg = "ERROR: IP inválida.\r\n";
         send(receiver.getFd(), error_msg, strlen(error_msg), 0);
         return;
     }

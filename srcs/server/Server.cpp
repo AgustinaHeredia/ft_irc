@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:07:11 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/04/01 14:32:11 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/01 17:11:40 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,7 +127,7 @@ void Server::processClientCommands(Client* client, const char* buffer) {
     client->getPartialCommand() += buffer;
     size_t pos;
     
-    while ((pos = client->getPartialCommand().find("\n")) != std::string::npos) {
+    while ((pos = client->getPartialCommand().find("\r\n")) != std::string::npos) {
         std::string cmd = client->getPartialCommand().substr(0, pos);
         client->getPartialCommand().erase(0, pos + 1);
         
@@ -170,13 +170,22 @@ void Server::acceptClients() {
     new_client->setAuthState(Client::AUTH_NONE);
     new_client->resetAuthAttempts();
 
-    std::string password_prompt = "Enter the password in the format: PASS <password>\n";
+    std::string password_prompt = "Enter the password in the format: PASS <password>\r\n";
     send(client_fd, password_prompt.c_str(), password_prompt.size(), 0);
     std::cout << "📤 [DEBUG] Sent password prompt to fd " << client_fd << std::endl;
 
     pollfd new_poll = {client_fd, POLLIN, 0};
     fds.push_back(new_poll);
     clientManager.addClient(new_client);
+}
+
+std::string getCreationDate() {
+    time_t now = time(0);
+    struct tm tstruct;
+    char buf[80];
+    tstruct = *localtime(&now);
+    strftime(buf, sizeof(buf), "%Y-%m-%d %X", &tstruct);
+    return buf;
 }
 
 void Server::handleAuthCommands(Client& client, const std::string& cmd) {
@@ -194,7 +203,7 @@ void Server::handleAuthCommands(Client& client, const std::string& cmd) {
         std::string input_password = args.substr(0, args.find_first_of(" \r\n"));
         if (input_password == password) {
             client.setAuthState(Client::AUTH_PASS_OK);
-            std::string success_msg = "Password accepted. Continue with NICK and then USER.\r\n";
+            std::string success_msg = ":irc.ircserv.com NOTICE AUTH :Password accepted\r\n";
             send(client.getFd(), success_msg.c_str(), success_msg.size(), 0);
             std::cout << "🔑 [DEBUG] Correct password from fd " << client.getFd() << std::endl;
         } else {
@@ -208,8 +217,8 @@ void Server::handleAuthCommands(Client& client, const std::string& cmd) {
         // Si el nick se asignó correctamente
         if (!client.getNickname().empty()) {
             client.setAuthState(Client::AUTH_NICK_OK);
-            std::string nick_msg = "NICK accepted.\r\nNow send USER in the format: USER <username> 0 * :<realname>\r\n";
-            send(client.getFd(), nick_msg.c_str(), nick_msg.size(), 0);
+            std::string nick_confirm = ":" + client.getNickname() + " NICK " + client.getNickname() + "\r\n";
+            send(client.getFd(), nick_confirm.c_str(), nick_confirm.size(), 0);
             std::cout << "📝 [DEBUG] NICK accepted from fd " << client.getFd() << std::endl;
         }
     }
@@ -219,26 +228,32 @@ void Server::handleAuthCommands(Client& client, const std::string& cmd) {
         
         // Si el USER se procesó correctamente
         if (client.getAuthState() == Client::AUTH_COMPLETE) {
-            std::string welcome_msg = ":127.0.0.1 001 " + client.getNickname() + " :Welcome to the IRC server\r\n";
-            send(client.getFd(), welcome_msg.c_str(), welcome_msg.size(), 0);
-            std::cout << "👤 [DEBUG] User accepted from fd " << client.getFd() << std::endl;
-        }
+        std::string servername = "irc.ircserv.com"; // Configurar esto
+        std::string welcome_msg = 
+            ":" + servername + " 001 " + client.getNickname() + " :Welcome to the IRC server " + client.getNickname() + "!" + client.getUsername() + "@" + servername + "\r\n"
+            ":" + servername + " 002 " + client.getNickname() + " :Your host is " + servername + ", running version 1.0\r\n"
+            ":" + servername + " 003 " + client.getNickname() + " :This server was created " + getCreationDate() + "\r\n"
+            ":" + servername + " 376 " + client.getNickname() + " :End of MOTD\r\n";
+        
+        send(client.getFd(), welcome_msg.c_str(), welcome_msg.size(), 0);
+    }
+        std::cout << "👤 [DEBUG] User accepted from fd " << client.getFd() << std::endl;
     }
     else {
         // Mensajes de error específicos por estado
         std::string error_msg;
         switch (client.getAuthState()) {
             case Client::AUTH_NONE:
-                error_msg = "ERROR: You must send PASS first\r\n";
+                error_msg = ":irc.ircserv.com 464 * :Password required\r\n";
                 break;
             case Client::AUTH_PASS_OK:
-                error_msg = "ERROR: You must send NICK now\r\n";
+                error_msg = ":irc.ircserv.com 461 * :You must send NICK now\r\n";
                 break;
             case Client::AUTH_NICK_OK:
-                error_msg = "ERROR: You must send USER now\r\n";
+                error_msg = ":irc.ircserv.com 461 * :You must send USER now\r\n";
                 break;
             default:
-                error_msg = "ERROR: Invalid command sequence\r\n";
+                error_msg = ":irc.ircserv.com 400 * :Invalid command sequence\r\n";
         }
         send(client.getFd(), error_msg.c_str(), error_msg.size(), 0);
         std::cout << "❌ Invalid auth sequence from fd " << client.getFd() << std::endl;
@@ -248,19 +263,19 @@ void Server::handleAuthCommands(Client& client, const std::string& cmd) {
 void Server::handlePassword(Client& client, const std::string& pass) {
     if (pass == password) {
         client.setAuthState(Client::AUTH_PASS_OK);
-        std::string msg = "Password accepted. Continue with NICK and then USER.\n";
+        std::string msg = "Password accepted. Continue with NICK and then USER.\r\n";
         send(client.getFd(), msg.c_str(), msg.size(), 0);
         std::cout << "🔑 [DEBUG] Correct password from fd " << client.getFd() << std::endl;
     } else {
         client.incrementAuthAttempt();
         if (client.getAuthAttempts() >= 3) {
-            std::string msg = "❌ Too many failed attempts\n";
+            std::string msg = "❌ Too many failed attempts\r\n";
             send(client.getFd(), msg.c_str(), msg.size(), 0);
             disconnectClient(client, "Too many failed attempts");
             std::cout << "🚫 Banned fd " << client.getFd() << " (bad attempts)" << std::endl;
         } else {
             std::ostringstream ss;
-            ss << "⚠️  Bad password (" << (3 - client.getAuthAttempts()) << " tries left)\n";
+            ss << "⚠️  Bad password (" << (3 - client.getAuthAttempts()) << " tries left)\r\n";
             send(client.getFd(), ss.str().c_str(), ss.str().size(), 0);
             std::cout << "❌ Bad password attempt from fd " << client.getFd() << std::endl;
         }
@@ -268,7 +283,7 @@ void Server::handlePassword(Client& client, const std::string& pass) {
 }
 
 void Server::disconnectClient(Client& client, const std::string& reason) {
-    std::string msg = "ERROR :" + reason + "\n";
+    std::string msg = "ERROR :" + reason + "\r\n";
     send(client.getFd(), msg.c_str(), msg.size(), 0);
     close(client.getFd());
     clientManager.removeClient(&client);

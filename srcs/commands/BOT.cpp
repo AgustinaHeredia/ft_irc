@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   BOT.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
+/*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/02 13:40:26 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/29 11:08:20 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/04/01 16:32:03 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ void CommandHandler::handleBot(Client &client, const std::string &message)
 {
     // Verificar autenticación del usuario
     if (!client.isAuthenticated()) {
-        const char* error_msg = "Warning: Authentication is missing.\n";
+        const char* error_msg = "Warning: Authentication is missing.\r\n";
         send(client.getFd(), error_msg, strlen(error_msg), 0);
         return;  // Asegúrate de que la función termine aquí si no está autenticado.
     }
@@ -31,9 +31,9 @@ void CommandHandler::handleBot(Client &client, const std::string &message)
     if (message.empty()) 
     {
         const char* menu = 
-            "Bot Options:\n"
-            " - !bot rps <rock|paper|scissors> : Play Rock, Paper, Scissors.\n"
-            " - !bot coinflip : Flip a coin (heads or tails).\n";
+            "Bot Options:\r\n"
+            " - !bot rps <rock|paper|scissors> : Play Rock, Paper, Scissors.\r\n"
+            " - !bot coinflip : Flip a coin (heads or tails).\r\n";
         send(client.getFd(), menu, strlen(menu), 0);
         return;
     }
@@ -50,7 +50,7 @@ void CommandHandler::handleBot(Client &client, const std::string &message)
 
         if (user_move.empty()) 
         {
-            const char* error_msg = "ERROR: You must specify your move (rock, paper, scissors).\n";
+            const char* error_msg = "ERROR: You must specify your move (rock, paper, scissors).\r\n";
             send(client.getFd(), error_msg, strlen(error_msg), 0);
             return;
         }
@@ -61,7 +61,7 @@ void CommandHandler::handleBot(Client &client, const std::string &message)
         // Validar la jugada
         if (user_move != "rock" && user_move != "paper" && user_move != "scissors") 
         {
-            const char* error_msg = "ERROR: Invalid move. Use 'rock', 'paper', or 'scissors'.\n";
+            const char* error_msg = "ERROR: Invalid move. Use 'rock', 'paper', or 'scissors'.\r\n";
             send(client.getFd(), error_msg, strlen(error_msg), 0);
             return;
         }
@@ -82,20 +82,20 @@ void CommandHandler::handleBot(Client &client, const std::string &message)
             result = "You lost!";
 
         // Enviar respuesta al cliente
-        std::string response = "Bot: I chose " + bot_move + ". " + result + "\n";
+        std::string response = "Bot: I chose " + bot_move + ". " + result + "\r\n";
         send(client.getFd(), response.c_str(), response.length(), 0);
     } 
     // Coinflip (cara o cruz)
     else if (subcommand == "coinflip") 
     {
         std::string result = (rand() % 2 == 0) ? "It came up heads!" : "It came up tails!";
-        std::string response = "Bot: " + result + "\n";
+        std::string response = "Bot: " + result + "\r\n";
         send(client.getFd(), response.c_str(), response.length(), 0);
     } 
     // Subcomando no reconocido
     else
     {
-        const char* error_msg = "ERROR: Unrecognized subcommand. Use !bot to view options.\n";
+        const char* error_msg = "ERROR: Unrecognized subcommand. Use !bot to view options.\r\n";
         send(client.getFd(), error_msg, strlen(error_msg), 0);
     }
 }

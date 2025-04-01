@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   NOTICE.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
+/*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/15 18:00:52 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/29 11:24:23 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/04/01 16:34:51 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ void CommandHandler::handleNotice(Server &srv, Client &client, const std::string
 
     // Verificar si el cliente está autenticado
     if (!client.isAuthenticated()) {
-        const char* error_msg = "ERROR: Not authenticated.\n";
+        const char* error_msg = "ERROR: Not authenticated.\r\n";
         send(client.getFd(), error_msg, strlen(error_msg), 0);
         std::cout << "[DEBUG] Unauthenticated client, rejecting NOTICE" << std::endl;
         return;
@@ -38,7 +38,7 @@ void CommandHandler::handleNotice(Server &srv, Client &client, const std::string
 
     // Verificar si el destinatario está vacío
     if (target.empty()) {
-        const char* error_msg = "ERROR: Incorrect use of NOTICE in target.\n";
+        const char* error_msg = "ERROR: Incorrect use of NOTICE in target.\r\n";
         send(client.getFd(), error_msg, strlen(error_msg), 0);
         std::cout << "[DEBUG] Error: Empty Target in NOTICE" << std::endl;
         return;
@@ -52,7 +52,7 @@ void CommandHandler::handleNotice(Server &srv, Client &client, const std::string
 
     // Verificar si el mensaje está vacío
     if (msg.empty()) {
-        const char* error_msg = "ERROR: Incorrect use of NOTICE. Empty message.\n";
+        const char* error_msg = "ERROR: Incorrect use of NOTICE. Empty message.\r\n";
         send(client.getFd(), error_msg, strlen(error_msg), 0);
         std::cout << "[DEBUG] Error: Empty message in NOTICE" << std::endl;
         return;
@@ -73,11 +73,11 @@ void CommandHandler::handleNotice(Server &srv, Client &client, const std::string
             std::cout << "[DEBUG] NOTICE addressed to channel: " << targets[i] << std::endl;
             Channel* channel = srv.getChannelManager().getChannelByName(targets[i]);
             if (channel) {
-                std::string formatted_msg = targets[i] + ":" + client.getNickname() + " :" + msg + "\n";
+                std::string formatted_msg = targets[i] + ":" + client.getNickname() + " :" + msg + "\r\n";
                 channel->broadcast(formatted_msg);
                 std::cout << "[DEBUG] Message sent to channel" << targets[i] << std::endl;
             } else {
-                const char* error_msg = "ERROR: Channel not found.\n";
+                const char* error_msg = "ERROR: Channel not found.\r\n";
                 send(client.getFd(), error_msg, strlen(error_msg), 0);
                 std::cout << "[DEBUG] Error: Channel not found -> " << targets[i] << std::endl;
             }
@@ -86,17 +86,17 @@ void CommandHandler::handleNotice(Server &srv, Client &client, const std::string
             Client* recipient = srv.getClientManager().getClientByNickname(targets[i]);
             if (recipient) {
                 // No se debe permitir que el destinatario responda automáticamente
-                std::string formatted_msg = client.getNickname() + ": " + msg + "\n";
+                std::string formatted_msg = client.getNickname() + ": " + msg + "\r\n";
                 int bytes_sent = send(recipient->getFd(), formatted_msg.c_str(), formatted_msg.size(), 0);
                 if (bytes_sent == -1) {
-                    const char* error_msg = "ERROR: Message cannot be sent at this time.\n";
+                    const char* error_msg = "ERROR: Message cannot be sent at this time.\r\n";
                     send(client.getFd(), error_msg, strlen(error_msg), 0);
                     std::cout << "[DEBUG] Error: Could not send message to " << targets[i] << std::endl;
                 } else {
                     std::cout << "[DEBUG] Message sent to user " << targets[i] << std::endl;
                 }
             } else {
-                const char* error_msg = "ERROR: Nickname not found.\n";
+                const char* error_msg = "ERROR: Nickname not found.\r\n";
                 send(client.getFd(), error_msg, strlen(error_msg), 0);
                 std::cout << "[DEBUG] Error: Nickname not found -> " << targets[i] << std::endl;
             }

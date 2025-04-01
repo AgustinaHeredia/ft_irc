@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 10:59:09 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/04/01 11:55:33 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/01 16:34:16 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ void CommandHandler::handleKick(Server &srv, Client &client, const std::string &
     std::cout << "[DEBUG] Channel: " << channel_name << ", User: " << target_nick << ", Reason" << reason << std::endl;
 
 	if (!client.isAuthenticated()) {
-        const char* error_msg = "Warning: Authentication is missing.\n";
+        const char* error_msg = "Warning: Authentication is missing.\r\n";
         send(client.getFd(), error_msg, strlen(error_msg), 0);
 		std::cout << "[DEBUG] Unauthenticated client attempted KICK " << std::endl;
         return;
@@ -37,7 +37,7 @@ void CommandHandler::handleKick(Server &srv, Client &client, const std::string &
 
     //  Verificar si el canal es válido
     if (channel_name.empty() || channel_name[0] != '#') {
-        const char* error_msg = "ERROR: Invalid channel name. Must begin with '#'.\n";
+        const char* error_msg = "ERROR: Invalid channel name. Must begin with '#'.\r\n";
         send(client.getFd(), error_msg, strlen(error_msg), 0);
         return;
     }
@@ -45,21 +45,21 @@ void CommandHandler::handleKick(Server &srv, Client &client, const std::string &
     //  Buscar el canal
     Channel* channel = srv.getChannelManager().getChannelByName(channel_name);
     if (!channel) {
-        const char* error_msg = "ERROR: Channel not found.\n";
+        const char* error_msg = "ERROR: Channel not found.\r\n";
         send(client.getFd(), error_msg, strlen(error_msg), 0);
         return;
     }
 
     //  Verificar si el usuario que ejecuta `KICK` está en el canal
     if (!channel->isClientInChannel(client)) {
-        const char* error_msg = "ERROR: You are not on this channel.\n";
+        const char* error_msg = "ERROR: You are not on this channel.\r\n";
         send(client.getFd(), error_msg, strlen(error_msg), 0);
         return;
     }
 
     //  Verificar si el usuario tiene permisos para expulsar (es operador)
     if (!channel->isOperator(client)) {
-        const char* error_msg = "ERROR: You do not have permission to ban users.\n";
+        const char* error_msg = "ERROR: You do not have permission to ban users.\r\n";
         send(client.getFd(), error_msg, strlen(error_msg), 0);
         return;
     }
@@ -67,17 +67,17 @@ void CommandHandler::handleKick(Server &srv, Client &client, const std::string &
     //  Buscar al usuario objetivo
     Client *target = srv.getClientManager().getClientByNickname(target_nick);
     if (!target || !channel->isClientInChannel(*target)) {
-        const char* error_msg = "ERROR: The user is not on this channel.\n";
+        const char* error_msg = "ERROR: The user is not on this channel.\r\n";
         send(client.getFd(), error_msg, strlen(error_msg), 0);
         return;
     }
 
     //  Notificar a todos en el canal sobre la expulsión
-    std::string kick_msg = ":" + client.getNickname() + " KICK " + channel_name + " " + target_nick + " :" + (reason.empty() ? "Expelled" : reason) + "\n";
+    std::string kick_msg = ":" + client.getNickname() + " KICK " + channel_name + " " + target_nick + " :" + (reason.empty() ? "Expelled" : reason) + "\r\n";
     channel->broadcast(kick_msg);
 
     //  Expulsar al usuario del canal
-    std::string target_msg = "You have been expelled from " + channel_name + ". Reason" + reason + "\n";
+    std::string target_msg = "You have been expelled from " + channel_name + ". Reason" + reason + "\r\n";
     send(target->getFd(), target_msg.c_str(), target_msg.size(), 0);
 
     channel->removeClient(*target);

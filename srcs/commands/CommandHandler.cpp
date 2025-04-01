@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:14 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/31 19:36:17 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/01 17:07:51 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,24 +103,24 @@ void CommandHandler::handleCommand(Client& client, const std::string& command) {
         } else if (message.find("ACCEPT") != std::string::npos) {
             handleDccAccept(server, client, message);
         } else {
-            send(client.getFd(), "ERROR: Unknown DCC command.\n", 30, 0);
+            send(client.getFd(), "ERROR: Unknown DCC command.\r\n", 30, 0);
         }
     } else if (cmd == "CAP") {
         // Ignoramos cualquier comando CAP que llegue desde el cliente
-        std::string cap_end_response = "CAP END\r\n";
-        send(client.getFd(), cap_end_response.c_str(), cap_end_response.size(), 0);
-        std::cout << "Responding to CAP END" << std::endl;
+        std::string cap_response = ":irc.ircserv.com CAP * LS :\r\n"; // Lista vacía
+        send(client.getFd(), cap_response.c_str(), cap_response.size(), 0);
+        std::cout << "✅ [DEBUG] Responded to CAP LS" << std::endl;
     } else if (cmd == "PING") {
 		std::string params;
         std::getline(iss, params);
 		params.erase(0, params.find_first_not_of(" \t\r\n"));
 		std::string response = "PONG " + params + "\r\n";
 		send(client.getFd(), response.c_str(), response.size(), 0);
-		std::cout << "Responded to PING: " << response;
+		std::cout << "✅ [DEBUG] Responded to PING: " << response;
 		return;
 	} else {
         std::cout << "Unknown command." << std::endl;
-        const char* warning_msg = "Warning: Unknown command.\n";
+        const char* warning_msg = "Warning: Unknown command.\r\n";
         send(client.getFd(), warning_msg, strlen(warning_msg), 0);
     }
 }

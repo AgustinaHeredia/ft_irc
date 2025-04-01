@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:27 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/31 16:27:29 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/01 16:31:19 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,12 +23,12 @@ Channel::~Channel() {}
 
 void Channel::addClient(Client& client) {
     clients.push_back(&client);
-    std::string welcome_msg = "Welcome to the channel " + name + ", " + client.getNickname() + "!\n";
+    std::string welcome_msg = "Welcome to the channel " + name + ", " + client.getNickname() + "!\r\n";
     send(client.getFd(), welcome_msg.c_str(), welcome_msg.length(), 0);
 }
 
 void Channel::removeClient(Client &client) {
-    std::string goodbye_msg = client.getNickname() + " has left the channel " + name + ".\n";
+    std::string goodbye_msg = client.getNickname() + " has left the channel " + name + ".\r\n";
     broadcast(goodbye_msg);
     clients.erase(std::remove(clients.begin(), clients.end(), &client), clients.end());
 }
