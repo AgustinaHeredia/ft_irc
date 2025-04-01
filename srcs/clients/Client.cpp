@@ -6,14 +6,21 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:37 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/31 18:12:39 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/01 18:37:34 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Client.hpp"
 #include <iostream>
 
-Client::Client(int fd, sockaddr_in addr) : client_fd(fd), client_addr(addr), connected(true), authState(AUTH_NONE), authAttempts(0) {
+Client::Client(int fd, sockaddr_in addr) : 
+    client_fd(fd), 
+    client_addr(addr),
+    connected(true),
+    authState(AUTH_NONE),
+    authAttempts(0),
+    expectingPasswordContinuation(false),
+    lastDataTime(time(0)) {
 
 	// Usar client_addr para mostrar la dirección del cliente
     char client_ip[INET_ADDRSTRLEN];
@@ -105,4 +112,21 @@ void Client::incrementAuthAttempt() {
 }
 void Client::resetAuthAttempts() {
     authAttempts = 0;
+}
+
+void Client::setExpectingContinuation(bool state) {
+    expectingPasswordContinuation = state;
+    if (state) updateLastActivity();
+}
+
+bool Client::isExpectingContinuation() const {
+    return expectingPasswordContinuation;
+}
+
+void Client::updateLastActivity() {
+    lastDataTime = time(0);
+}
+
+bool Client::isBufferStale() const {
+    return (time(0) - lastDataTime > 30); // 30 segundos de timeout
 }

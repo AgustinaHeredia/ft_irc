@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:07:11 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/04/01 18:03:59 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/01 18:39:20 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,6 +80,7 @@ void Server::process() {
         acceptClients();
     }
 
+    // Procesar eventos en los clientes
     for (size_t i = 1; i < fds.size(); i++) {
         if (fds[i].revents & POLLIN) {
             char buffer[1024];
@@ -103,9 +104,20 @@ void Server::process() {
             processClientCommands(client, buffer);
         }
 
+        // Manejar errores del socket
         if (fds[i].revents & (POLLERR | POLLHUP | POLLNVAL)) {
             std::cout << "⚠️  Socket error on fd " << fds[i].fd << std::endl;
             handleClientDisconnection(i);
+        }
+    }
+
+    // Limpiar buffers antiguos (fuera del bucle de fds)
+    std::vector<Client*> allClients = clientManager.getAllClients();
+    for (std::vector<Client*>::iterator it = allClients.begin(); it != allClients.end(); ++it) {
+        Client* client = *it;
+        if (!client->getPartialCommand().empty() && client->isBufferStale()) {
+            std::cout << "🕒 Clearing stale buffer for client " << client->getNickname() << std::endl;
+            client->getPartialCommand().clear();
         }
     }
 }
@@ -116,6 +128,7 @@ void Server::handleClientDisconnection(size_t index) {
         std::cout << "👋 Client disconnected: " << client->getNickname() 
                   << " (fd: " << fds[index].fd << ")" << std::endl;
         channelManager.removeClientFromChannels(client);
+        client->getPartialCommand().clear();
         clientManager.removeClient(client);
     }
     close(fds[index].fd);
@@ -124,24 +137,52 @@ void Server::handleClientDisconnection(size_t index) {
 }
 
 void Server::processClientCommands(Client* client, const char* buffer) {
+    client->updateLastActivity();
     client->getPartialCommand() += buffer;
+
+    // Debug: Mostrar estado actual
+    std::cout << "🔵 [BUFFER] FD " << client->getFd() 
+              << " State: " << client->getAuthState()
+              << " Data: '" << client->getPartialCommand() << "'"
+              << std::endl;
+
+    // Manejo especial para PASS parcial
+    if (client->getAuthState() == Client::AUTH_NONE) {
+        size_t pass_pos = client->getPartialCommand().find("PASS");
+        if (pass_pos != std::string::npos) {
+            if (client->getPartialCommand().find("\r\n") == std::string::npos) {
+                client->setExpectingContinuation(true);
+                std::cout << "⏳ Waiting for complete PASS command..." << std::endl;
+                return;
+            }
+        }
+    }
+
+    // Procesamiento normal de comandos
     size_t pos;
-    
     while ((pos = client->getPartialCommand().find("\r\n")) != std::string::npos) {
         std::string cmd = client->getPartialCommand().substr(0, pos);
-        client->getPartialCommand().erase(0, pos + 1);
+        client->getPartialCommand().erase(0, pos + 2);
         
         cmd.erase(0, cmd.find_first_not_of(" \t\r\n"));
         cmd.erase(cmd.find_last_not_of(" \t\r\n") + 1);
 
         if (!cmd.empty()) {
-            std::cout << "🔧 Processing command: [" << cmd << "]" << std::endl;
+            std::cout << "🟢 Processing command: [" << cmd << "]" << std::endl;
             if (client->getAuthState() != Client::AUTH_COMPLETE) {
                 handleAuthCommands(*client, cmd);
             } else {
                 commandHandler.handleCommand(*client, cmd);
             }
         }
+        client->setExpectingContinuation(false);
+    }
+
+    // Limpiar buffer si lleva mucho tiempo inactivo
+    if (client->isBufferStale()) {
+        std::cout << "🕒 Clearing stale buffer for FD " << client->getFd() << std::endl;
+        client->getPartialCommand().clear();
+        client->setExpectingContinuation(false);
     }
 }
 

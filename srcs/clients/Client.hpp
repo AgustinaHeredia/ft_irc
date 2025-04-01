@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:31 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/31 18:02:20 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/01 18:38:40 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,10 @@ private:
     bool authenticated;
 	std::string partialCommand;
     AuthState authState;
-    int authAttempts; 
+    int authAttempts;
+
+    bool expectingPasswordContinuation;
+    time_t lastDataTime;
 
 public:
     Client(int fd, sockaddr_in addr);
@@ -68,6 +71,11 @@ public:
     int getAuthAttempts() const;
     void incrementAuthAttempt();
     void resetAuthAttempts();
+
+    void setExpectingContinuation(bool state);
+    bool isExpectingContinuation() const;
+    void updateLastActivity();
+    bool isBufferStale() const;
 
 };
 
