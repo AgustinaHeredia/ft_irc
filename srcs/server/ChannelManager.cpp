@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/02 18:21:47 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/31 16:32:01 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/01 19:37:43 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,8 +36,17 @@ Channel* ChannelManager::getChannelByName(const std::string &name) {
 
 void ChannelManager::removeClientFromChannels(Client* client) {
     for (std::vector<Channel>::iterator it = channels.begin(); it != channels.end(); ++it) {
-        if (it->isClientInChannel(*client)) {
-            it->removeClient(*client);
+        it->removeClient(*client); // Seguro incluso si el cliente es zombie
+    }
+}
+
+void ChannelManager::notifyClientQuit(const std::string& nickname, const std::string& reason) {
+    std::string msg = ":" + nickname + " QUIT :" + reason + "\r\n";
+    
+    for (std::vector<Channel>::iterator ch_it = channels.begin(); ch_it != channels.end(); ++ch_it) {
+        if (ch_it->hasClient(nickname)) {
+            ch_it->broadcast(msg);
+            ch_it->removeClient(nickname); // Ahora usa el método que acepta un nickname
         }
     }
 }

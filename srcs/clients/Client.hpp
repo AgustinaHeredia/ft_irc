@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:31 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/04/01 18:38:40 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/01 19:20:14 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,7 @@ private:
 
     bool expectingPasswordContinuation;
     time_t lastDataTime;
+    bool _zombie;
 
 public:
     Client(int fd, sockaddr_in addr);
@@ -76,7 +77,8 @@ public:
     bool isExpectingContinuation() const;
     void updateLastActivity();
     bool isBufferStale() const;
-
+    bool isZombie() const;
+    void setZombie(bool state);
 };
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:07:11 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/04/01 18:39:20 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/01 19:55:47 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,6 +110,7 @@ void Server::process() {
             handleClientDisconnection(i);
         }
     }
+    clientManager.processRemovals();
 
     // Limpiar buffers antiguos (fuera del bucle de fds)
     std::vector<Client*> allClients = clientManager.getAllClients();
@@ -123,20 +124,32 @@ void Server::process() {
 }
 
 void Server::handleClientDisconnection(size_t index) {
-    Client* client = clientManager.getClientByFd(fds[index].fd);
+    int fd = fds[index].fd;
+    Client* client = clientManager.getClientByFd(fd);
+    
     if (client) {
-        std::cout << "👋 Client disconnected: " << client->getNickname() 
-                  << " (fd: " << fds[index].fd << ")" << std::endl;
-        channelManager.removeClientFromChannels(client);
-        client->getPartialCommand().clear();
-        clientManager.removeClient(client);
+        // Solo notificar si no fue un QUIT voluntario
+        if (!client->isZombie()) {
+            std::cout << "👋 Client disconnected: " << client->getNickname() 
+                      << " (fd: " << fd << ")" << std::endl;
+            channelManager.notifyClientQuit(client->getNickname(), "Connection closed");
+        }
+        clientManager.queueForRemoval(client);
     }
-    close(fds[index].fd);
+    
+    close(fd);
     fds.erase(fds.begin() + index);
-    std::cout << "🔌 Socket " << fds[index].fd << " closed and removed" << std::endl;
+    std::cout << "🔌 Socket " << fd << " closed" << std::endl;
 }
 
 void Server::processClientCommands(Client* client, const char* buffer) {
+    if (client->isZombie()) {
+        return; // Ignorar comandos de clientes marcados para eliminación
+    }
+    if (!clientManager.isClientValid(client)) {
+        std::cout << "⚠️  Client already removed. Ignoring commands." << std::endl;
+        return;
+    }
     client->updateLastActivity();
     client->getPartialCommand() += buffer;
 
@@ -160,9 +173,13 @@ void Server::processClientCommands(Client* client, const char* buffer) {
 
     // Procesamiento normal de comandos
     size_t pos;
-    while ((pos = client->getPartialCommand().find("\r\n")) != std::string::npos) {
+    while ((pos = client->getPartialCommand().find('\n')) != std::string::npos) {
         std::string cmd = client->getPartialCommand().substr(0, pos);
-        client->getPartialCommand().erase(0, pos + 2);
+        // Eliminar \r si está presente al final
+        if (!cmd.empty() && cmd[cmd.size() - 1] == '\r') {
+            cmd.erase(cmd.size() - 1);
+        }
+        client->getPartialCommand().erase(0, pos + 1);
         
         cmd.erase(0, cmd.find_first_not_of(" \t\r\n"));
         cmd.erase(cmd.find_last_not_of(" \t\r\n") + 1);

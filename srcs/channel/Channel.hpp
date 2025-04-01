@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: patri <patri@student.42.fr>                +#+  +:+       +#+        */
+/*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:22 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/26 15:34:25 by patri            ###   ########.fr       */
+/*   Updated: 2025/04/01 19:38:10 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,9 @@ class Channel {
 		void removeInvitedUser(Client &client);
 
 		std::vector<Client*> getClients() const;
+		void broadcastQuit(const std::string& nickname, const std::string& reason);
+		bool hasClient(const std::string& nickname) const;
+ 	    void removeClient(const std::string& nickname);
 
 };
 

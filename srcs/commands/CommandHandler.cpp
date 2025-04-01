@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:14 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/04/01 17:07:51 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/01 19:49:23 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,9 +52,23 @@ void CommandHandler::handleCommand(Client& client, const std::string& command) {
         std::getline(iss, user);
         handleUserCommand(server, client, user);
     } else if (cmd == "QUIT") {
-        std::cout << "QUIT command received" << std::endl;
-        server.getClientManager().removeClient(&client);
-		return;
+    std::cout << "QUIT command received" << std::endl;
+    std::string reason = command.substr(cmd.length());
+    reason.erase(0, reason.find_first_not_of(" \t\r\n"));
+    
+    // 1. Marcar como zombie inmediatamente
+    client.setZombie(true);
+    
+    // 2. Notificar canales (usando solo el nickname)
+    server.getChannelManager().notifyClientQuit(client.getNickname(), reason);
+    
+    // 3. Cerrar el socket directamente
+    close(client.getFd());
+    
+    // 4. Programar eliminación segura
+    server.getClientManager().queueForRemoval(&client);
+    
+    return;
     } else if (cmd == "PRIVMSG") {
         std::string message;
         std::getline(iss, message);

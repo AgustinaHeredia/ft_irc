@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:37 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/04/01 18:37:34 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/01 19:26:16 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,8 @@ Client::Client(int fd, sockaddr_in addr) :
     authState(AUTH_NONE),
     authAttempts(0),
     expectingPasswordContinuation(false),
-    lastDataTime(time(0)) {
+    lastDataTime(time(0)),
+    _zombie(false) {
 
 	// Usar client_addr para mostrar la dirección del cliente
     char client_ip[INET_ADDRSTRLEN];
@@ -129,4 +130,17 @@ void Client::updateLastActivity() {
 
 bool Client::isBufferStale() const {
     return (time(0) - lastDataTime > 30); // 30 segundos de timeout
+}
+
+bool Client::isZombie() const {
+    return _zombie;
+}
+
+void Client::setZombie(bool state) {
+    _zombie = state;
+    // Opcional: marcar como desconectado si es zombie
+    if (state) {
+        connected = false;
+        partialCommand.clear();
+    }
 }

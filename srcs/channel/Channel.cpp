@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:27 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/04/01 16:31:19 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/01 19:37:30 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,4 +140,33 @@ void Channel::removeInvitedUser(Client& client) {
 
 std::vector<Client*> Channel::getClients() const {
     return clients;
+}
+
+void Channel::broadcastQuit(const std::string& nickname, const std::string& reason) {
+    std::string msg = ":" + nickname + " QUIT :" + reason + "\r\n";
+    for (std::vector<Client*>::iterator it = clients.begin(); it != clients.end(); ++it) {
+        Client* client = *it;
+        if (client && !client->isZombie()) {
+            send(client->getFd(), msg.c_str(), msg.size(), 0);
+        }
+    }
+}
+
+bool Channel::hasClient(const std::string& nickname) const {
+    for (std::vector<Client*>::const_iterator it = clients.begin(); it != clients.end(); ++it) {
+        if ((*it)->getNickname() == nickname) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void Channel::removeClient(const std::string& nickname) {
+    for (std::vector<Client*>::iterator it = clients.begin(); it != clients.end(); ) {
+        if ((*it)->getNickname() == nickname) {
+            it = clients.erase(it);
+        } else {
+            ++it;
+        }
+    }
 }
