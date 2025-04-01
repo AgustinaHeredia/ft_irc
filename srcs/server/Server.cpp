@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:07:11 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/04/01 17:11:40 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/01 18:03:59 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -203,7 +203,7 @@ void Server::handleAuthCommands(Client& client, const std::string& cmd) {
         std::string input_password = args.substr(0, args.find_first_of(" \r\n"));
         if (input_password == password) {
             client.setAuthState(Client::AUTH_PASS_OK);
-            std::string success_msg = ":irc.ircserv.com NOTICE AUTH :Password accepted\r\n";
+            std::string success_msg = ":irc.ircserv.com NOTICE AUTH :Password accepted -> Continue with NICK and then USER \r\n";
             send(client.getFd(), success_msg.c_str(), success_msg.size(), 0);
             std::cout << "🔑 [DEBUG] Correct password from fd " << client.getFd() << std::endl;
         } else {
@@ -217,7 +217,7 @@ void Server::handleAuthCommands(Client& client, const std::string& cmd) {
         // Si el nick se asignó correctamente
         if (!client.getNickname().empty()) {
             client.setAuthState(Client::AUTH_NICK_OK);
-            std::string nick_confirm = ":" + client.getNickname() + " NICK " + client.getNickname() + "\r\n";
+            std::string nick_confirm = ":" + client.getNickname() + " NICK " + client.getNickname() + " -> Now send USER in the format: USER <username> 0 * :<realname>\r\n";
             send(client.getFd(), nick_confirm.c_str(), nick_confirm.size(), 0);
             std::cout << "📝 [DEBUG] NICK accepted from fd " << client.getFd() << std::endl;
         }
