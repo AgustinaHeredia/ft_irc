@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   TOPIC.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
+/*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/09 00:05:34 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/29 11:48:27 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/04/01 11:58:14 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ void CommandHandler::handleTopic(Server &srv, Client &client, const std::string 
 
     //  Si no se especifica un nuevo tema, devolver el tema actual
     if (topic.empty()) {
-        std::string topic_msg = "TOPIC " + channel_name + " : " + channel->getTopic() + "\n";
+        std::string topic_msg = "TOPIC " + channel_name + channel->getTopic() + "\n";
         send(client.getFd(), topic_msg.c_str(), topic_msg.size(), 0);
         return;
     }
@@ -74,6 +74,6 @@ void CommandHandler::handleTopic(Server &srv, Client &client, const std::string 
     channel->setTopic(topic);
 
     //  Notificar a todos en el canal sobre el cambio
-    std::string topic_change_msg = ":" + client.getNickname() + " TOPIC " + channel_name + " :" + topic + "\n";
+    std::string topic_change_msg = ":" + client.getNickname() + " TOPIC " + channel_name + topic + "\n";
     channel->broadcast(topic_change_msg);
 }

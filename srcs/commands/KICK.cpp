@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   KICK.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
+/*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 10:59:09 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/29 11:18:21 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/04/01 11:55:33 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ void CommandHandler::handleKick(Server &srv, Client &client, const std::string &
     std::getline(iss >> std::ws, reason); // Captura el motivo si existe
 
     std::cout << "[DEBUG] KICK command received: " << message << std::endl;
-    std::cout << "[DEBUG] Channel: " << channel_name << ", User: " << target_nick << ", Reason: " << reason << std::endl;
+    std::cout << "[DEBUG] Channel: " << channel_name << ", User: " << target_nick << ", Reason" << reason << std::endl;
 
 	if (!client.isAuthenticated()) {
         const char* error_msg = "Warning: Authentication is missing.\n";
@@ -77,7 +77,7 @@ void CommandHandler::handleKick(Server &srv, Client &client, const std::string &
     channel->broadcast(kick_msg);
 
     //  Expulsar al usuario del canal
-    std::string target_msg = "You have been expelled from " + channel_name + ". Reason: " + reason + "\n";
+    std::string target_msg = "You have been expelled from " + channel_name + ". Reason" + reason + "\n";
     send(target->getFd(), target_msg.c_str(), target_msg.size(), 0);
 
     channel->removeClient(*target);

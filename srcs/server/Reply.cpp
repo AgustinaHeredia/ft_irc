@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/30 18:54:48 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/31 19:31:11 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/01 14:33:17 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,40 +20,46 @@ namespace Reply {
 
     std::string r_RPL_NOTOPIC(const std::vector<std::string> &av) {
         if (av.empty()) return "331 * :No topic is set";
-        return "331 " + av[0] + " :No topic is set";
+        return av[0] + " :No topic is set";
     }
 
     std::string r_RPL_TOPIC(const std::vector<std::string> &av) {
         if (av.size() < 2) return "332 * :No topic available";
-        return "332 " + av[0] + " :" + av[1];
+        return av[0] + " :" + av[1];
     }
 
     std::string r_RPL_NAMREPLY(const std::vector<std::string> &av) {
         if (av.size() < 2) return "353 * :No users in channel";
-        return "353 " + av[0] + " :" + av[1];
+        return av[0] + " :" + av[1];
     }
 
     std::string r_RPL_ENDOFNAMES(const std::vector<std::string> &av) {
         if (av.empty()) return "366 * :End of NAMES list";
-        return "366 " + av[0] + " :End of NAMES list";
+        return av[0] + " :End of NAMES list";
     }
 
     std::string r_ERR_UNKNOWNCOMMAND(const std::vector<std::string> &av) {
         if (av.empty()) return "421 * :Unknown command";
-        return "421 " + av[0] + " :Unknown command";
+        return av[0] + " :Unknown command";
     }
-
-    std::string r_ERR_NEEDMOREPARAMS(const std::vector<std::string> &av) {
-        if (av.empty()) return "461 * :Not enough parameters";
-        return "461 " + av[0] + " :Not enough parameters";
+    
+    std::string r_ERR_INVALIDNICK(const std::vector<std::string>& av) {
+        if (av.empty()) return "432 * :No nickname given";
+        return av[0] + " :Invalid nickname (cannot contain spaces)";
     }
-
+    
     std::string r_ERR_NICKNAMEINUSE(const std::vector<std::string> &av) {
         if (av.empty()) return "433 * :Nickname is already in use";
-        return "433 " + av[0] + " :Nickname is already in use";
+        return av[0] + " :Nickname is already in use";
     }
+
     std::string r_ERR_NOTREGISTERED(const std::vector<std::string> &av) {
         if (av.empty()) return "451 * :You have not registered (PASS/NICK/USER required)";
-        return "451 " + av[0] + " :You have not registered (PASS/NICK/USER required)";
+        return av[0] + " :You have not registered (PASS/NICK/USER required)";
+    }
+    
+    std::string r_ERR_NEEDMOREPARAMS(const std::vector<std::string> &av) {
+        if (av.empty()) return "461 * :Not enough parameters";
+        return av[0] + " :Not enough parameters";
     }
 }

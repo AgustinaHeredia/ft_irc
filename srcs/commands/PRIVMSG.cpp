@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   PRIVMSG.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agusheredia <agusheredia@student.42.fr>    +#+  +:+       +#+        */
+/*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/02 13:39:53 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/29 11:43:24 by agusheredia      ###   ########.fr       */
+/*   Updated: 2025/04/01 11:42:29 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ void CommandHandler::handlePrivmsg(Server &srv, Client &client, const std::strin
         handleDccSend(srv, client, msg);
         return;
     }
-    std::cout << "[DEBUG] PRIVMSG of " << client.getNickname() << " from " << target << ": " << msg << std::endl;
+    std::cout << "[DEBUG] PRIVMSG of " << client.getNickname() << " from " << target << msg << std::endl;
 
     // Manejo de múltiples destinatarios
     std::vector<std::string> targets;
@@ -78,7 +78,7 @@ void CommandHandler::handlePrivmsg(Server &srv, Client &client, const std::strin
             std::cout << "[DEBUG] PRIVMSG directed to channel: " << targets[i] << std::endl;
             Channel* channel = srv.getChannelManager().getChannelByName(targets[i]);
             if (channel) {
-                std::string formatted_msg = targets[i] + ":" + client.getNickname() + " :" + msg + "\n";
+                std::string formatted_msg = targets[i] + ":" + client.getNickname() + msg + "\n";
                 channel->broadcast(formatted_msg);
                 std::cout << "[DEBUG] Message sent to channel " << targets[i] << std::endl;
             } else {
@@ -90,7 +90,8 @@ void CommandHandler::handlePrivmsg(Server &srv, Client &client, const std::strin
             std::cout << "[DEBUG] PRIVMSG addressed to user: " << targets[i] << std::endl;
             Client* recipient = srv.getClientManager().getClientByNickname(targets[i]);
             if (recipient) {
-                std::string formatted_msg = client.getNickname() + ": " + msg + "\n";
+                std::string formatted_msg = client.getNickname() + msg + "\n";
+                // std::string formatted_msg = client.getNickname() + ": " + msg + "\n";
                 int bytes_sent = send(recipient->getFd(), formatted_msg.c_str(), formatted_msg.size(), 0);
                 if (bytes_sent == -1) {
                     const char* error_msg = "ERROR: Message cannot be sent at this time.\n";

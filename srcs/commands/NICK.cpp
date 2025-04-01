@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/02 13:38:59 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/31 19:23:21 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/01 14:30:07 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,14 @@
 #include <sys/socket.h>
 
 void CommandHandler::handleNickCommand(Server& srv, Client& client, const std::string &nick) {
-    // Eliminar CR/LF y espacios
+
+    if (nick.find(" ") != std::string::npos) {
+        std::vector<std::string> params;
+        params.push_back("NICK");
+        srv.sendReply(Reply::ERR_INVALIDNICK, client, params);
+        return;
+    }
+
     std::string clean_nick = nick.substr(0, nick.find_first_of(" \r\n"));
 
     if (clean_nick.empty()) {

@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:07:11 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/31 19:33:56 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/01 14:32:11 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -301,6 +301,8 @@ void Server::sendReply(const std::string &code, Client &client, const std::vecto
         message = Reply::ERR_NEEDMOREPARAMS + " " + client.getNickname() + " " + Reply::r_ERR_NEEDMOREPARAMS(params) + "\r\n";
     } else if (code == Reply::ERR_NICKNAMEINUSE) {
         message = Reply::ERR_NICKNAMEINUSE + " " + client.getNickname() + " " + Reply::r_ERR_NICKNAMEINUSE(params) + "\r\n";
+    } else if (code == Reply::ERR_INVALIDNICK) {
+        message = Reply::ERR_INVALIDNICK + " " + client.getNickname() + " " + Reply::r_ERR_INVALIDNICK(params) + "\r\n";
     } else {
         std::cerr << "Unknown reply code: " << code << std::endl;
         return;
