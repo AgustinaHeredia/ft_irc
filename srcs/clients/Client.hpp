@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:31 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/04/02 14:45:27 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/02 17:28:07 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,7 @@ private:
     bool expectingPasswordContinuation;
     time_t lastDataTime;
     bool _zombie;
+    bool invisible;
 
 public:
     Client(int fd, sockaddr_in addr);
@@ -82,6 +83,8 @@ public:
     bool isZombie() const;
     void setZombie(bool state);
     std::string getFullIdentifier() const;
+    bool isInvisible() const;
+    void setInvisible(bool state);
 
 };
 

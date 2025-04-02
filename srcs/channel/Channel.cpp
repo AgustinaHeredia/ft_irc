@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:27 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/04/01 19:37:30 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/02 17:26:51 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -169,4 +169,8 @@ void Channel::removeClient(const std::string& nickname) {
             ++it;
         }
     }
+}
+
+bool Channel::isSecret() const {
+    return false;
 }

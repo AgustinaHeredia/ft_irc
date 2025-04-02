@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:09 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/04/02 14:39:39 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/02 16:44:18 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,8 @@
 #include "../clients/Client.hpp"
 
 class Server;
+// class Client;
+// class Channel;
 
 class CommandHandler {
 	private:
@@ -26,6 +28,9 @@ class CommandHandler {
 		void		botSendResponse(Client& client, const std::string& msg);
 		void		botRPSLogic(Client& client, const std::string& user_choice);
 		std::string	botGenerateRPSChoice();
+		// void sendWhoReply(Server& srv, Client& sender, Client* target, const std::string& channel_name);
+		// void sendEndOfWho(Server& srv, Client& client, const std::string& target);
+		// std::string getWhoFlags(Client& client, Channel* channel);
 	public:
 		CommandHandler(Server &server);
 		void handleCommand(Client &client, const std::string &command);

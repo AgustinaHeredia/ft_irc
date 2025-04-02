@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:37 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/04/02 15:40:53 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/02 17:27:39 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -152,4 +152,12 @@ std::string Client::getHostname() const {
 
 std::string Client::getFullIdentifier() const {
     return getNickname() + "!" + getUsername() + "@" + getHostname();
+}
+
+bool Client::isInvisible() const {
+    return invisible;
+}
+
+void Client::setInvisible(bool state) {
+    invisible = state;
 }
