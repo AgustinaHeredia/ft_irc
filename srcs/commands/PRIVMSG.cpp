@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/02 13:39:53 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/04/02 14:49:21 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/02 16:09:56 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,6 +79,15 @@ void CommandHandler::handlePrivmsg(Server &srv, Client &client, const std::strin
             Client* recipient = srv.getClientManager().getClientByNickname(current_target);
             if (recipient) {
                 std::string formatted_msg = ":" + client.getFullIdentifier() + " PRIVMSG " + current_target + " :" + msg + "\r\n";
+                // std::string formatted_msg = ":" + client.getNickname() + "!" + client.getUsername() + "@" + srv.getServerName() + " PRIVMSG " + current_target + " :" + msg + "\r\n";
+                // Antes de enviar el mensaje
+                std::cout << "[DEBUG] Cliente emisor: " << client.getNickname() 
+                        << ", fullID: " << client.getFullIdentifier() << std::endl;
+                std::cout << "[DEBUG] Cliente receptor: " << recipient->getNickname() 
+                        << ", estado: " << (recipient->getAuthState() ? "Registrado" : "No registrado") << std::endl;
+                std::cout << "[DEBUG] Mensaje formateado: " << formatted_msg;
+                int result = send(recipient->getFd(), formatted_msg.c_str(), formatted_msg.size(), 0);
+                std::cout << "[DEBUG] Resultado envío: " << result << " bytes" << std::endl;
                 send(recipient->getFd(), formatted_msg.c_str(), formatted_msg.size(), 0);
             } else {
                 std::vector<std::string> params;
