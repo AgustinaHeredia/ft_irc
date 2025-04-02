@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/30 18:54:51 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/04/02 12:49:38 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/02 14:04:04 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,11 @@ namespace Reply {
     static const std::string ERR_UMODEUNKNOWNFLAG = "501";
     static const std::string ERR_USERSDONTMATCH = "502";
     static const std::string ERR_UNKNOWNMODE = "472";
+    static const std::string ERR_NORECIPIENT = "411";
+    static const std::string ERR_NOTEXTTOSEND = "412";
+    static const std::string ERR_CANNOTSENDTOCHAN = "404";
+    static const std::string ERR_NOSUCHNICK = "401";
+
 
     // Funciones para generar respuestas
     std::string r_RPL_WELCOME(const std::vector<std::string> &av);
@@ -62,5 +67,9 @@ namespace Reply {
     std::string r_ERR_UMODEUNKNOWNFLAG(const std::vector<std::string> &av);
     std::string r_ERR_USERSDONTMATCH(const std::vector<std::string> &av);
     std::string r_ERR_UNKNOWNMODE(const std::vector<std::string> &av);
+    std::string r_ERR_NORECIPIENT(const std::vector<std::string> &av);
+    std::string r_ERR_NOTEXTTOSEND(const std::vector<std::string> &av);
+    std::string r_ERR_CANNOTSENDTOCHAN(const std::vector<std::string> &av);
+    std::string r_ERR_NOSUCHNICK(const std::vector<std::string> &av);
 }
 #endif

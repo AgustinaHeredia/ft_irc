@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/30 18:54:48 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/04/02 12:49:58 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/02 14:04:18 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,5 +86,20 @@ namespace Reply {
     std::string r_ERR_UNKNOWNMODE(const std::vector<std::string> &av) {
         if (av.size() < 3) return ": 472 * * :is unknown mode char to me\r\n";
         return ":" + av[0] + " 472 " + av[1] + " " + av[2] + " :is unknown mode char to me\r\n";
+    }
+    std::string Reply::r_ERR_NORECIPIENT(const std::vector<std::string> &av) {
+        return ":" + av[0] + " 411 " + av[1] + " :No recipient given (PRIVMSG)\r\n";
+    }
+
+    std::string Reply::r_ERR_NOTEXTTOSEND(const std::vector<std::string> &av) {
+        return ":" + av[0] + " 412 " + av[1] + " :No text to send\r\n";
+    }
+
+    std::string Reply::r_ERR_CANNOTSENDTOCHAN(const std::vector<std::string> &av) {
+        return ":" + av[0] + " 404 " + av[1] + " " + av[2] + " :Cannot send to channel\r\n";
+    }
+
+    std::string Reply::r_ERR_NOSUCHNICK(const std::vector<std::string> &av) {
+        return ":" + av[0] + " 401 " + av[1] + " " + av[2] + " :No such nick/channel\r\n";
     }
 }
