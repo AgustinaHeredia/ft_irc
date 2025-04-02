@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/09 00:05:34 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/04/01 16:35:44 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/02 15:09:02 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ void CommandHandler::handleTopic(Server &srv, Client &client, const std::string 
 
     //  Si no se especifica un nuevo tema, devolver el tema actual
     if (topic.empty()) {
-        std::string topic_msg = "TOPIC " + channel_name + channel->getTopic() + "\r\n";
+        std::string topic_msg = "TOPIC " + channel_name + " " + channel->getTopic() + "\r\n";
         send(client.getFd(), topic_msg.c_str(), topic_msg.size(), 0);
         return;
     }
@@ -74,6 +74,6 @@ void CommandHandler::handleTopic(Server &srv, Client &client, const std::string 
     channel->setTopic(topic);
 
     //  Notificar a todos en el canal sobre el cambio
-    std::string topic_change_msg = ":" + client.getNickname() + " TOPIC " + channel_name + topic + "\r\n";
+    std::string topic_change_msg = ":" + client.getNickname() + " TOPIC " + channel_name + " " + topic + "\r\n";
     channel->broadcast(topic_change_msg);
 }
