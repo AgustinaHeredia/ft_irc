@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:37 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/04/01 19:26:16 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/02 14:50:13 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,4 +143,12 @@ void Client::setZombie(bool state) {
         connected = false;
         partialCommand.clear();
     }
+}
+
+std::string Client::getHostname() const {
+    return hostname;
+}
+
+std::string Client::getFullIdentifier() const {
+    return getNickname() + "!" + getUsername() + "@" + getHostname();
 }

@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:31 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/04/01 19:20:14 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/02 14:45:27 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@ private:
 	std::string nickname;
     std::string username;
 	std::string realname;
+	std::string hostname;
     bool authenticated;
 	std::string partialCommand;
     AuthState authState;
@@ -72,6 +73,7 @@ public:
     int getAuthAttempts() const;
     void incrementAuthAttempt();
     void resetAuthAttempts();
+    std::string getHostname() const;
 
     void setExpectingContinuation(bool state);
     bool isExpectingContinuation() const;
@@ -79,6 +81,8 @@ public:
     bool isBufferStale() const;
     bool isZombie() const;
     void setZombie(bool state);
+    std::string getFullIdentifier() const;
+
 };
 
 #endif

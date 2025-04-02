@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:09 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/03/31 19:33:38 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/02 14:39:39 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,10 @@ class CommandHandler {
 		void handleBot(Client &client, const std::string &message);
 		void handleDccSend(Server& srv, Client& sender, const std::string& msg);
 		void handleDccAccept(Server& srv, Client& receiver, const std::string& msg);
+		
+		std::vector<std::string> split(const std::string &s, char delimiter);
+		std::string trim(const std::string &str);
+
 };
 
 #endif

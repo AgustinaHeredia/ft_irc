@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:14 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/04/02 12:54:42 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/02 14:39:10 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,4 +137,25 @@ void CommandHandler::handleCommand(Client& client, const std::string& command) {
         const char* warning_msg = "Warning: Unknown command.\r\n";
         send(client.getFd(), warning_msg, strlen(warning_msg), 0);
     }
+}
+
+// Función auxiliar para dividir cadenas
+std::vector<std::string> CommandHandler::split(const std::string &s, char delimiter) {
+    std::vector<std::string> tokens;
+    std::string token;
+    std::istringstream tokenStream(s);
+    while (std::getline(tokenStream, token, delimiter)) {
+        if (!token.empty()) {
+            tokens.push_back(trim(token));
+        }
+    }
+    return tokens;
+}
+
+// Función auxiliar para trim
+std::string CommandHandler::trim(const std::string &str) {
+    size_t first = str.find_first_not_of(" \t");
+    if (std::string::npos == first) return "";
+    size_t last = str.find_last_not_of(" \t");
+    return str.substr(first, (last - first + 1));
 }

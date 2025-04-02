@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/02 13:39:53 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/04/02 14:03:37 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/02 14:49:21 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #include "../server/Server.hpp"
 #include "../clients/Client.hpp"
 #include "../channel/Channel.hpp"
-#include "Reply.hpp"
+#include "../server/Reply.hpp"
 #include <iostream>
 #include <sstream>
 #include <cstring>
@@ -65,7 +65,7 @@ void CommandHandler::handlePrivmsg(Server &srv, Client &client, const std::strin
             Channel* channel = srv.getChannelManager().getChannelByName(current_target);
             if (channel && channel->isClientInChannel(client)) {
                 std::string formatted_msg = ":" + client.getFullIdentifier() + " PRIVMSG " + current_target + " :" + msg + "\r\n";
-                channel->broadcast(formatted_msg, client.getNickname());
+                channel->broadcast(formatted_msg);
             } else {
                 std::vector<std::string> params;
                 params.push_back(srv.getServerName());
@@ -90,25 +90,4 @@ void CommandHandler::handlePrivmsg(Server &srv, Client &client, const std::strin
             }
         }
     }
-}
-
-// Función auxiliar para dividir cadenas
-std::vector<std::string> CommandHandler::split(const std::string &s, char delimiter) {
-    std::vector<std::string> tokens;
-    std::string token;
-    std::istringstream tokenStream(s);
-    while (std::getline(tokenStream, token, delimiter)) {
-        if (!token.empty()) {
-            tokens.push_back(trim(token));
-        }
-    }
-    return tokens;
-}
-
-// Función auxiliar para trim
-std::string CommandHandler::trim(const std::string &str) {
-    size_t first = str.find_first_not_of(" \t");
-    if (std::string::npos == first) return "";
-    size_t last = str.find_last_not_of(" \t");
-    return str.substr(first, (last - first + 1));
 }
