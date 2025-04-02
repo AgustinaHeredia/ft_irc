@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:14 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/04/01 19:49:23 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/02 12:54:42 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,7 +121,7 @@ void CommandHandler::handleCommand(Client& client, const std::string& command) {
         }
     } else if (cmd == "CAP") {
         // Ignoramos cualquier comando CAP que llegue desde el cliente
-        std::string cap_response = ":irc.ircserv.com CAP * LS :\r\n"; // Lista vacía
+        std::string cap_response = server.getServerName() + " CAP * LS :\r\n"; // Lista vacía
         send(client.getFd(), cap_response.c_str(), cap_response.size(), 0);
         std::cout << "✅ [DEBUG] Responded to CAP LS" << std::endl;
     } else if (cmd == "PING") {

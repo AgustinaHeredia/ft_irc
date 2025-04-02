@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/09 19:14:17 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/04/01 16:34:33 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/02 12:50:28 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,84 +26,113 @@ MODE #canal -l           # Eliminar límite de usuarios
 #include "../server/Server.hpp"
 #include "../clients/Client.hpp"
 #include "../channel/Channel.hpp"
+#include "../server/Reply.hpp"
 #include <iostream>
 #include <sstream>
 #include <cstring>
 
 void CommandHandler::handleMode(Server &srv, Client &client, const std::string &message) {
     std::istringstream iss(message);
-    std::string channel_name, mode, param;
-    iss >> channel_name >> mode >> param;
+    std::string target, mode, param;
+    iss >> target >> mode >> param;
 
-    std::cout << "[DEBUG] MODE command received: " << message << std::endl;
-    std::cout << "[DEBUG] Channel: " << channel_name << ", Mode: " << mode << ", Parameter: " << param << std::endl;
-
-	if (!client.isAuthenticated()) {
-        const char* error_msg = "Warning: Authentication is missing.\r\n";
-        send(client.getFd(), error_msg, strlen(error_msg), 0);
-		std::cout << "[DEBUG] Unauthenticated client attempted MODE " << std::endl;
+    if (!client.isAuthenticated()) {
+        std::vector<std::string> params;
+        params.push_back(srv.getServerName());
+        params.push_back(client.getNickname());
+        std::string error = Reply::r_ERR_NOTREGISTERED(params);
+        send(client.getFd(), error.c_str(), error.size(), 0);
         return;
     }
 
-    //  Verificar si el canal es válido
-    if (channel_name.empty() || channel_name[0] != '#') {
-        const char* error_msg = "ERROR: Invalid channel name. Must begin with '#'.\r\n";
-        send(client.getFd(), error_msg, strlen(error_msg), 0);
-		return;
+    // Manejo de modos de usuario
+    if (target[0] != '#' && target[0] != '&') {
+        if (target != client.getNickname()) {
+            std::vector<std::string> params;
+            params.push_back(srv.getServerName());
+            params.push_back(client.getNickname());
+            std::string error = Reply::r_ERR_USERSDONTMATCH(params);
+            send(client.getFd(), error.c_str(), error.size(), 0);
+            return;
+        }
+        
+        if (mode == "+i") {
+            std::string response = ":" + srv.getServerName() + " MODE " + target + " +i\r\n";
+            send(client.getFd(), response.c_str(), response.size(), 0);
+        } else {
+            std::vector<std::string> params;
+            params.push_back(srv.getServerName());
+            params.push_back(client.getNickname());
+            std::string error = Reply::r_ERR_UMODEUNKNOWNFLAG(params);
+            send(client.getFd(), error.c_str(), error.size(), 0);
+        }
+        return;
     }
 
-    //  Buscar el canal
-    Channel* channel = srv.getChannelManager().getChannelByName(channel_name);
+    // Manejo de canales
+    Channel* channel = srv.getChannelManager().getChannelByName(target);
     if (!channel) {
-        const char* error_msg = "ERROR: Channel not found.\r\n";
-        send(client.getFd(), error_msg, strlen(error_msg), 0);
-		return;
+        std::vector<std::string> params;
+        params.push_back(srv.getServerName());
+        params.push_back(client.getNickname());
+        params.push_back(target);
+        std::string error = Reply::r_ERR_NOSUCHCHANNEL(params);
+        send(client.getFd(), error.c_str(), error.size(), 0);
+        return;
     }
 
     if (!channel->isOperator(client)) {
-        const char* error_msg = "ERROR: You do not have permission to change channel modes.\r\n";
-		send(client.getFd(), error_msg, strlen(error_msg), 0);
+        std::vector<std::string> params;
+        params.push_back(srv.getServerName());
+        params.push_back(client.getNickname());
+        params.push_back(target);
+        std::string error = Reply::r_ERR_CHANOPRIVSNEEDED(params);
+        send(client.getFd(), error.c_str(), error.size(), 0);
         return;
     }
 
     if (mode == "+o") {
-        Client* target = srv.getClientManager().getClientByNickname(param);
-        if (target && channel->isClientInChannel(*target)) {
-            channel->addOperator(*target);
-            channel->broadcast(":" + client.getNickname() + " MODE " + channel_name + " +o " + param + "\r\n");
+        Client* target_client = srv.getClientManager().getClientByNickname(param);
+        if (target_client && channel->isClientInChannel(*target_client)) {
+            channel->addOperator(*target_client);
+            channel->broadcast(":" + client.getNickname() + " MODE " + target + " +o " + param + "\r\n");
         }
     } else if (mode == "-o") {
-        Client* target = srv.getClientManager().getClientByNickname(param);
-        if (target && channel->isClientInChannel(*target)) {
-            channel->removeOperator(*target);
-            channel->broadcast(":" + client.getNickname() + " MODE " + channel_name + " -o " + param + "\r\n");
+        Client* target_client = srv.getClientManager().getClientByNickname(param);
+        if (target_client && channel->isClientInChannel(*target_client)) {
+            channel->removeOperator(*target_client);
+            channel->broadcast(":" + client.getNickname() + " MODE " + target + " -o " + param + "\r\n");
         }
     } else if (mode == "+i") {
         channel->setInviteOnly(true);
-        channel->broadcast(":" + client.getNickname() + " MODE " + channel_name + " +i\r\n");
+        channel->broadcast(":" + client.getNickname() + " MODE " + target + " +i\r\n");
     } else if (mode == "-i") {
         channel->setInviteOnly(false);
-        channel->broadcast(":" + client.getNickname() + " MODE " + channel_name + " -i\r\n");
+        channel->broadcast(":" + client.getNickname() + " MODE " + target + " -i\r\n");
     } else if (mode == "+t") {
         channel->setTopicRestricted(true);
-        channel->broadcast(":" + client.getNickname() + " MODE " + channel_name + " +t\r\n");
+        channel->broadcast(":" + client.getNickname() + " MODE " + target + " +t\r\n");
     } else if (mode == "-t") {
         channel->setTopicRestricted(false);
-        channel->broadcast(":" + client.getNickname() + " MODE " + channel_name + " -t\r\n");
+        channel->broadcast(":" + client.getNickname() + " MODE " + target + " -t\r\n");
     } else if (mode == "+k") {
         channel->setKey(param);
-        channel->broadcast(":" + client.getNickname() + " MODE " + channel_name + " +k\r\n");
+        channel->broadcast(":" + client.getNickname() + " MODE " + target + " +k " + param + "\r\n");
     } else if (mode == "-k") {
         channel->removeKey();
-        channel->broadcast(":" + client.getNickname() + " MODE " + channel_name + " -k\r\n");
+        channel->broadcast(":" + client.getNickname() + " MODE " + target + " -k\r\n");
     } else if (mode == "+l") {
-        channel->setUserLimit(std::atoi(param.c_str()));
-        channel->broadcast(":" + client.getNickname() + " MODE " + channel_name + " +l " + param + "\r\n");
+        channel->setUserLimit(atoi(param.c_str()));
+        channel->broadcast(":" + client.getNickname() + " MODE " + target + " +l " + param + "\r\n");
     } else if (mode == "-l") {
         channel->removeUserLimit();
-        channel->broadcast(":" + client.getNickname() + " MODE " + channel_name + " -l\r\n");
+        channel->broadcast(":" + client.getNickname() + " MODE " + target + " -l\r\n");
     } else {
-        const char* error_msg = "ERROR: Mode not recognized.\r\n";
-		send(client.getFd(), error_msg, strlen(error_msg), 0);
+        std::vector<std::string> params;
+        params.push_back(srv.getServerName());
+        params.push_back(client.getNickname());
+        params.push_back(mode);
+        std::string error = Reply::r_ERR_UNKNOWNMODE(params);
+        send(client.getFd(), error.c_str(), error.size(), 0);
     }
 }

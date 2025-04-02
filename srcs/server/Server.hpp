@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:42 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/04/01 12:10:47 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/02 13:09:38 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,9 +32,11 @@
 
 class Server {
 	private:
-		int server_fd; // Descriptor de socket del servidor
 		int port;
+		const Config &config;
 		std::string password;
+		std::string server_name;
+		int server_fd; // Descriptor de socket del servidor
 		std::vector<pollfd> fds; // Vector para manejar múltiples clientes
 		CommandHandler commandHandler;
 
@@ -43,7 +45,6 @@ class Server {
 	
 		void acceptClients();
 
-		const Config &config;
 		
 	public:
 		Server(int puerto, const std::string &pwd, const Config &conf);
@@ -55,6 +56,8 @@ class Server {
     	ChannelManager &getChannelManager(); // Método para obtener el ChannelManager
 
 		Config	&getConfig(void);
+		const std::string &getServerName() const;
+		void setServerName(const std::string &name);
 		
 		void sendReply(const std::string &code, Client &client, const std::vector<std::string> &params);
 		void disconnectClient(Client& client, const std::string& reason);

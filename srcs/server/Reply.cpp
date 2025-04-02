@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/30 18:54:48 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/04/01 14:33:17 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/02 12:49:58 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,52 +14,77 @@
 
 namespace Reply {
     std::string r_RPL_WELCOME(const std::vector<std::string> &av) {
-        if (av.empty()) return "001 * :Welcome to the Internet Relay Network";
-        return "001 " + av[0] + " :Welcome to the Internet Relay Network";
+        if (av.empty()) return ": 001 * :Welcome to the Internet Relay Network\r\n";
+        return ":" + av[0] + " 001 " + av[0] + " :Welcome to the Internet Relay Network\r\n";
     }
 
     std::string r_RPL_NOTOPIC(const std::vector<std::string> &av) {
-        if (av.empty()) return "331 * :No topic is set";
-        return av[0] + " :No topic is set";
+        if (av.size() < 2) return ": 331 * * :No topic is set\r\n";
+        return ":" + av[0] + " 331 " + av[1] + " " + av[2] + " :No topic is set\r\n";
     }
 
     std::string r_RPL_TOPIC(const std::vector<std::string> &av) {
-        if (av.size() < 2) return "332 * :No topic available";
-        return av[0] + " :" + av[1];
+        if (av.size() < 3) return ": 332 * * :No topic available\r\n";
+        return ":" + av[0] + " 332 " + av[1] + " " + av[2] + " :" + av[3] + "\r\n";
     }
 
     std::string r_RPL_NAMREPLY(const std::vector<std::string> &av) {
-        if (av.size() < 2) return "353 * :No users in channel";
-        return av[0] + " :" + av[1];
+        if (av.size() < 3) return ": 353 * * :No users in channel\r\n";
+        return ":" + av[0] + " 353 " + av[1] + " " + av[2] + " :" + av[3] + "\r\n";
     }
 
     std::string r_RPL_ENDOFNAMES(const std::vector<std::string> &av) {
-        if (av.empty()) return "366 * :End of NAMES list";
-        return av[0] + " :End of NAMES list";
+        if (av.size() < 2) return ": 366 * * :End of NAMES list\r\n";
+        return ":" + av[0] + " 366 " + av[1] + " " + av[2] + " :End of NAMES list\r\n";
     }
 
     std::string r_ERR_UNKNOWNCOMMAND(const std::vector<std::string> &av) {
-        if (av.empty()) return "421 * :Unknown command";
-        return av[0] + " :Unknown command";
+        if (av.size() < 2) return ": 421 * :Unknown command\r\n";
+        return ":" + av[0] + " 421 " + av[1] + " :Unknown command\r\n";
     }
     
     std::string r_ERR_INVALIDNICK(const std::vector<std::string>& av) {
-        if (av.empty()) return "432 * :No nickname given";
-        return av[0] + " :Invalid nickname (cannot contain spaces)";
+        if (av.size() < 2) return ": 432 * :No nickname given\r\n";
+        return ":" + av[0] + " 432 " + av[1] + " :Invalid nickname (cannot contain spaces)\r\n";
     }
     
     std::string r_ERR_NICKNAMEINUSE(const std::vector<std::string> &av) {
-        if (av.empty()) return "433 * :Nickname is already in use";
-        return av[0] + " :Nickname is already in use";
+        if (av.size() < 2) return ": 433 * :Nickname is already in use\r\n";
+        return ":" + av[0] + " 433 " + av[1] + " :Nickname is already in use\r\n";
     }
 
     std::string r_ERR_NOTREGISTERED(const std::vector<std::string> &av) {
-        if (av.empty()) return "451 * :You have not registered (PASS/NICK/USER required)";
-        return av[0] + " :You have not registered (PASS/NICK/USER required)";
+        if (av.size() < 2) return ": 451 * :You have not registered (PASS/NICK/USER required)\r\n";
+        return ":" + av[0] + " 451 " + av[1] + " :You have not registered (PASS/NICK/USER required)\r\n";
     }
     
     std::string r_ERR_NEEDMOREPARAMS(const std::vector<std::string> &av) {
-        if (av.empty()) return "461 * :Not enough parameters";
-        return av[0] + " :Not enough parameters";
+        if (av.size() < 2) return ": 461 * :Not enough parameters\r\n";
+        return ":" + av[0] + " 461 " + av[1] + " :Not enough parameters\r\n";
+    }
+
+    std::string r_ERR_NOSUCHCHANNEL(const std::vector<std::string> &av) {
+        if (av.size() < 3) return ": 403 * * :No such channel\r\n";
+        return ":" + av[0] + " 403 " + av[1] + " " + av[2] + " :No such channel\r\n";
+    }
+
+    std::string r_ERR_CHANOPRIVSNEEDED(const std::vector<std::string> &av) {
+        if (av.size() < 3) return ": 482 * * :You're not channel operator\r\n";
+        return ":" + av[0] + " 482 " + av[1] + " " + av[2] + " :You're not channel operator\r\n";
+    }
+
+    std::string r_ERR_UMODEUNKNOWNFLAG(const std::vector<std::string> &av) {
+        if (av.size() < 2) return ": 501 * :Unknown MODE flag\r\n";
+        return ":" + av[0] + " 501 " + av[1] + " :Unknown MODE flag\r\n";
+    }
+
+    std::string r_ERR_USERSDONTMATCH(const std::vector<std::string> &av) {
+        if (av.size() < 2) return ": 502 * :Cannot change mode for other users\r\n";
+        return ":" + av[0] + " 502 " + av[1] + " :Cannot change mode for other users\r\n";
+    }
+
+    std::string r_ERR_UNKNOWNMODE(const std::vector<std::string> &av) {
+        if (av.size() < 3) return ": 472 * * :is unknown mode char to me\r\n";
+        return ":" + av[0] + " 472 " + av[1] + " " + av[2] + " :is unknown mode char to me\r\n";
     }
 }
