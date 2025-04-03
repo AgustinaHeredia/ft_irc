@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/02 13:40:26 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/04/01 16:34:03 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/03 16:31:27 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ void CommandHandler::handleJoin(Server &srv, Client &client, const std::string &
         channel = srv.getChannelManager().getChannelByName(channel_name);
         // Al crear el canal, asignar al cliente como operador.
         channel->setOperator(client, true);
-        std::cout << "[DEBUG] " << client.getNickname() << " assigned as operator in" << channel_name << std::endl;
+        std::cout << "[DEBUG] " << client.getNickname() << " assigned as operator in " << channel_name << std::endl;
     }
 
     // Verificar si el cliente ya está en el canal
@@ -62,7 +62,7 @@ void CommandHandler::handleJoin(Server &srv, Client &client, const std::string &
     std::cout << "[DEBUG] Client " << client.getNickname() << " joined " << channel_name << std::endl;
 
     // Notificar al canal que el cliente se unió
-    std::string join_msg = ":" + client.getNickname() + " JOIN " + channel_name + "\r\n";
+    std::string join_msg = ":" + client.getFullIdentifier() + " JOIN " + channel_name + "\r\n";
     channel->broadcast(join_msg);
 
     // Si el canal es solo por invitación, verificar la invitación

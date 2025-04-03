@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:09 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/04/02 16:44:18 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/03 15:53:47 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,8 @@ class CommandHandler {
 		void handleKick(Server &srv, Client &client, const std::string &message);
 		void handleTopic(Server &srv, Client &client, const std::string &message);
 		void handleMode(Server& srv, Client &client, const std::string &message);
+		void handleChannelMode(Server &srv, Client &client, const std::string &target, const std::string &message);
+		void handleUserMode(Server &srv, Client &client, const std::string &target, const std::string &message);
 		void handleInvite(Server& srv, Client& client, const std::string& message);
 		void handleWho(Server &srv, Client &client, const std::string& message);
 		void handleNotice(Server &srv, Client &client, const std::string &message);

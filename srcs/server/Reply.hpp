@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/30 18:54:51 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/04/02 16:19:15 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/03 15:55:56 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,9 @@ namespace Reply {
     static const std::string ERR_NOSUCHNICK = "401";
     static const std::string ERR_WHOREPLY = "352";
     static const std::string ERR_ENDOFWHO = "315";
+    static const std::string ERR_USERNOTINCHANNEL = "441";
+    static const std::string RPL_UMODEIS = "221";
+
 
     // Funciones para generar respuestas
     std::string r_RPL_WELCOME(const std::vector<std::string> &av);
@@ -62,5 +65,7 @@ namespace Reply {
     std::string r_ERR_NOSUCHNICK(const std::vector<std::string> &av);
     std::string r_RPL_WHOREPLY(const std::vector<std::string>& params);
     std::string r_RPL_ENDOFWHO(const std::vector<std::string>& params);
+    std::string r_ERR_USERNOTINCHANNEL(const std::vector<std::string> &av);
+    std::string r_RPL_UMODEIS(const std::vector<std::string> &av);
 }
 #endif

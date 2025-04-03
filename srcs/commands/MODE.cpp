@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/09 19:14:17 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/04/02 17:27:14 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/03 16:35:33 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ void CommandHandler::handleMode(Server &srv, Client &client, const std::string &
     }
 
     // Verificar autenticación
-    if (!client.isRegistered()) {
+    if (!client.isAuthenticated()) {
         std::vector<std::string> params;
         params.push_back(srv.getServerName());
         params.push_back(client.getNickname());
@@ -140,19 +140,19 @@ void CommandHandler::handleChannelMode(Server &srv, Client &client, const std::s
                     channel->removeOperator(*target_client);
                 }
                 
-                std::string msg = ":" + client.getNickname() + " MODE " + target + " " + sign + c + " " + target_client->getNickname() + "\r\n";
+                std::string msg = ":" + client.getFullIdentifier() + " MODE " + target + " " + sign + c + " " + target_client->getNickname() + "\r\n";
                 channel->broadcast(msg);
                 break;
             }
             case 'i': {
                 channel->setInviteOnly(sign == '+');
-                std::string msg = ":" + client.getNickname() + " MODE " + target + " " + sign + c + "\r\n";
+                std::string msg = ":" + client.getFullIdentifier() + " MODE " + target + " " + sign + c + "\r\n";
                 channel->broadcast(msg);
                 break;
             }
             case 't': {
                 channel->setTopicRestricted(sign == '+');
-                std::string msg = ":" + client.getNickname() + " MODE " + target + " " + sign + c + "\r\n";
+                std::string msg = ":" + client.getFullIdentifier() + " MODE " + target + " " + sign + c + "\r\n";
                 channel->broadcast(msg);
                 break;
             }
@@ -170,11 +170,11 @@ void CommandHandler::handleChannelMode(Server &srv, Client &client, const std::s
                         continue;
                     }
                     channel->setKey(params[param_index++]);
-                    std::string msg = ":" + client.getNickname() + " MODE " + target + " +k " + channel->getKey() + "\r\n";
+                    std::string msg = ":" + client.getFullIdentifier() + " MODE " + target + " +k " + channel->getKey() + "\r\n";
                     channel->broadcast(msg);
                 } else {
                     channel->removeKey();
-                    std::string msg = ":" + client.getNickname() + " MODE " + target + " -k\r\n";
+                    std::string msg = ":" + client.getFullIdentifier() + " MODE " + target + " -k\r\n";
                     channel->broadcast(msg);
                 }
                 break;
@@ -194,11 +194,11 @@ void CommandHandler::handleChannelMode(Server &srv, Client &client, const std::s
                     }
                     int limit = atoi(params[param_index++].c_str());
                     channel->setUserLimit(limit);
-                    std::string msg = ":" + client.getNickname() + " MODE " + target + " +l " + params[param_index-1] + "\r\n";
+                    std::string msg = ":" + client.getFullIdentifier() + " MODE " + target + " +l " + params[param_index-1] + "\r\n";
                     channel->broadcast(msg);
                 } else {
                     channel->removeUserLimit();
-                    std::string msg = ":" + client.getNickname() + " MODE " + target + " -l\r\n";
+                    std::string msg = ":" + client.getFullIdentifier() + " MODE " + target + " -l\r\n";
                     channel->broadcast(msg);
                 }
                 break;
@@ -283,7 +283,7 @@ void CommandHandler::handleUserMode(Server &srv, Client &client, const std::stri
 
     // Notificar cambios si los hubo
     if (changes_made) {
-        std::string msg = ":" + client.getNickname() + " MODE " + client.getNickname() + " :" + modes_changed + "\r\n";
+        std::string msg = ":" + client.getFullIdentifier() + " MODE " + client.getNickname() + " :" + modes_changed + "\r\n";
         send(client.getFd(), msg.c_str(), msg.size(), 0);
     }
 }

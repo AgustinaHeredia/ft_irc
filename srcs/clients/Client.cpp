@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:37 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/04/02 17:27:39 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/03 16:20:12 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,20 +17,25 @@ Client::Client(int fd, sockaddr_in addr) :
     client_fd(fd), 
     client_addr(addr),
     connected(true),
-    hostname("irc.ircserv.com"),
+    nickname(""),
+    username(""),
+    realname(""),
+    hostname(""),
+    authenticated(false),
+    partialCommand(""),
     authState(AUTH_NONE),
     authAttempts(0),
     expectingPasswordContinuation(false),
     lastDataTime(time(0)),
-    _zombie(false) {
-
-	// Usar client_addr para mostrar la dirección del cliente
+    _zombie(false),
+    invisible(false)
+{
     char client_ip[INET_ADDRSTRLEN];
     inet_ntop(AF_INET, &(client_addr.sin_addr), client_ip, INET_ADDRSTRLEN);
-	connected = true;
+    hostname = client_ip;
+    
     std::cout << "Client connected from " << client_ip << ":" << ntohs(client_addr.sin_port) << std::endl;
 }
-
 Client::~Client() {
     if (connected) {
         disconnect();
@@ -147,6 +152,9 @@ void Client::setZombie(bool state) {
 }
 
 std::string Client::getHostname() const {
+    if (hostname.empty()) {
+        return "localhost"; // Fallback seguro
+    }
     return hostname;
 }
 

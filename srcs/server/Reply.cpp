@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/30 18:54:48 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/04/02 16:17:01 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/03 15:56:06 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,5 +109,14 @@ namespace Reply {
 
     std::string r_RPL_ENDOFWHO(const std::vector<std::string>& params) {
         return ":" + params[0] + " 315 " + params[1] + " " + params[2] + " :End of WHO list\r\n";
+    }
+    std::string r_ERR_USERNOTINCHANNEL(const std::vector<std::string> &av) {
+        if (av.size() < 3) return ": 441 * * :They aren't on that channel\r\n";
+        return ":" + av[0] + " 441 " + av[1] + " " + av[2] + " :They aren't on that channel\r\n";
+    }
+
+    std::string r_RPL_UMODEIS(const std::vector<std::string> &av) {
+        if (av.size() < 3) return ": 221 * :No user modes set\r\n";
+        return ":" + av[0] + " 221 " + av[1] + " " + av[2] + "\r\n";
     }
 }

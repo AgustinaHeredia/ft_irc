@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/02 13:39:53 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/04/02 16:09:56 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/03 17:11:00 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,7 @@ void CommandHandler::handlePrivmsg(Server &srv, Client &client, const std::strin
                 std::cout << "[DEBUG] Mensaje formateado: " << formatted_msg;
                 int result = send(recipient->getFd(), formatted_msg.c_str(), formatted_msg.size(), 0);
                 std::cout << "[DEBUG] Resultado envío: " << result << " bytes" << std::endl;
-                send(recipient->getFd(), formatted_msg.c_str(), formatted_msg.size(), 0);
+                // send(recipient->getFd(), formatted_msg.c_str(), formatted_msg.size(), 0);
             } else {
                 std::vector<std::string> params;
                 params.push_back(srv.getServerName());
