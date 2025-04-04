@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:22 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/04/03 19:48:20 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/04 12:39:06 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ class Channel {
 
 		void addClient(Client &client);
 		void removeClient(Client &client);
-		void broadcast(const std::string &message);
+		void broadcast(const std::string &message, const std::string &exclude_nick = "");
 		std::string getName() const;
 		bool isClientInChannel(const Client &client) const;
 		bool isEmpty() const;

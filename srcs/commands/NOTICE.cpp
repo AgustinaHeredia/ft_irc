@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/15 18:00:52 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/04/01 16:34:51 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/04 13:10:07 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,9 +73,8 @@ void CommandHandler::handleNotice(Server &srv, Client &client, const std::string
             std::cout << "[DEBUG] NOTICE addressed to channel: " << targets[i] << std::endl;
             Channel* channel = srv.getChannelManager().getChannelByName(targets[i]);
             if (channel) {
-                std::string formatted_msg = targets[i] + ":" + client.getNickname() + " :" + msg + "\r\n";
-                channel->broadcast(formatted_msg);
-                std::cout << "[DEBUG] Message sent to channel" << targets[i] << std::endl;
+                std::string formatted_msg = ":" + client.getFullIdentifier() + " NOTICE " + channel->getName() + " :" + msg + "\r\n";
+                channel->broadcast(formatted_msg, client.getNickname()); // Excluir al emisor
             } else {
                 const char* error_msg = "ERROR: Channel not found.\r\n";
                 send(client.getFd(), error_msg, strlen(error_msg), 0);
@@ -85,17 +84,10 @@ void CommandHandler::handleNotice(Server &srv, Client &client, const std::string
             std::cout << "[DEBUG] NOTICE addressed to user: " << targets[i] << std::endl;
             Client* recipient = srv.getClientManager().getClientByNickname(targets[i]);
             if (recipient) {
-                // No se debe permitir que el destinatario responda automáticamente
-                std::string formatted_msg = client.getNickname() + ": " + msg + "\r\n";
-                int bytes_sent = send(recipient->getFd(), formatted_msg.c_str(), formatted_msg.size(), 0);
-                if (bytes_sent == -1) {
-                    const char* error_msg = "ERROR: Message cannot be sent at this time.\r\n";
-                    send(client.getFd(), error_msg, strlen(error_msg), 0);
-                    std::cout << "[DEBUG] Error: Could not send message to " << targets[i] << std::endl;
-                } else {
-                    std::cout << "[DEBUG] Message sent to user " << targets[i] << std::endl;
-                }
-            } else {
+                std::string formatted_msg = ":" + client.getFullIdentifier() + " NOTICE " + targets[i] + " :" + msg + "\r\n";
+                send(recipient->getFd(), formatted_msg.c_str(), formatted_msg.size(), 0);
+            }
+            else {
                 const char* error_msg = "ERROR: Nickname not found.\r\n";
                 send(client.getFd(), error_msg, strlen(error_msg), 0);
                 std::cout << "[DEBUG] Error: Nickname not found -> " << targets[i] << std::endl;
