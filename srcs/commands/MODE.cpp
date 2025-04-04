@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/09 19:14:17 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/04/03 16:35:33 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/04 11:58:11 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -221,6 +221,8 @@ void CommandHandler::handleUserMode(Server &srv, Client &client, const std::stri
     iss >> dummy >> mode_str;
 
     // Verificar que el objetivo sea el propio usuario
+    std::cout << "[DEBUG] MODE command received for user: " << target << std::endl;
+    std::cout << "[DEBUG] Current user: " << client.getNickname() << std::endl;
     if (target != client.getNickname()) {
         std::vector<std::string> params;
         params.push_back(srv.getServerName());

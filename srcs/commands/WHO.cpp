@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/09 21:26:06 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/04/01 16:36:09 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/04 12:05:24 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,8 @@ void CommandHandler::handleWho(Server& srv, Client& client, const std::string& m
         std::string response = "Connected users:\r\n";
         std::vector<Client*> clients = srv.getClientManager().getAllClients();
         for (size_t i = 0; i < clients.size(); ++i) {
-            if (clients[i]->isConnected()) {
+            // Añadir condición !clients[i]->isInvisible()
+            if (clients[i]->isConnected() && !clients[i]->isInvisible()) {
                 response += clients[i]->getNickname() + "\r\n";
             }
         }
@@ -70,7 +71,8 @@ void CommandHandler::handleWho(Server& srv, Client& client, const std::string& m
     std::string response = "Users in " + channel_name + ":\r\n";
     std::vector<Client*> clientsInChannel = channel->getClients();
     for (size_t i = 0; i < clientsInChannel.size(); ++i) {
-        if (clientsInChannel[i]->isConnected()) { 
+        // Añadir condición !clientsInChannel[i]->isInvisible()
+        if (clientsInChannel[i]->isConnected() && !clientsInChannel[i]->isInvisible()) {
             response += clientsInChannel[i]->getNickname();
             if (channel->isOperator(*clientsInChannel[i])) {
                 response += " (Operator)";
