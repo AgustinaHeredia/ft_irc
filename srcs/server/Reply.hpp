@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/30 18:54:51 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/04/03 15:55:56 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/03 19:58:49 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@ namespace Reply {
     static const std::string RPL_WELCOME = "001";
     static const std::string RPL_NOTOPIC = "331";
     static const std::string RPL_TOPIC = "332";
+    static const std::string RPL_TOPICWHOTIME = "333";
     static const std::string RPL_NAMREPLY = "353";
     static const std::string RPL_ENDOFNAMES = "366";
     static const std::string ERR_UNKNOWNCOMMAND = "421";
@@ -41,7 +42,11 @@ namespace Reply {
     static const std::string ERR_ENDOFWHO = "315";
     static const std::string ERR_USERNOTINCHANNEL = "441";
     static const std::string RPL_UMODEIS = "221";
-
+    static const std::string ERR_INVITEONLYCHAN = "473";
+    static const std::string ERR_BADCHANNELKEY = "475";
+    static const std::string ERR_CHANNELISFULL = "471";
+    static const std::string ERR_USERONCHANNEL = "443";
+    static const std::string ERR_NOTONCHANNEL = "442";
 
     // Funciones para generar respuestas
     std::string r_RPL_WELCOME(const std::vector<std::string> &av);
@@ -67,5 +72,12 @@ namespace Reply {
     std::string r_RPL_ENDOFWHO(const std::vector<std::string>& params);
     std::string r_ERR_USERNOTINCHANNEL(const std::vector<std::string> &av);
     std::string r_RPL_UMODEIS(const std::vector<std::string> &av);
+    std::string r_ERR_INVITEONLYCHAN(const std::vector<std::string> &av);
+    std::string r_ERR_BADCHANNELKEY(const std::vector<std::string> &av);
+    std::string r_ERR_CHANNELISFULL(const std::vector<std::string> &av);
+    std::string r_ERR_USERONCHANNEL(const std::vector<std::string> &av);
+    std::string r_RPL_TOPICWHOTIME(const std::vector<std::string> &av);
+    std::string r_ERR_NOTONCHANNEL(const std::vector<std::string>& params);
+
 }
 #endif

@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/02 13:40:26 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/04/03 16:31:27 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/04 11:17:31 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,23 +17,32 @@
 #include <sstream>
 #include <cstring>
 
-void CommandHandler::handleJoin(Server &srv, Client &client, const std::string &channel_name) {
-    std::cout << "[DEBUG] JOIN command received: " << channel_name << std::endl;
-    std::cout << "[DEBUG] Name of the extracted channel: " << channel_name << std::endl;
+void CommandHandler::handleJoin(Server &srv, Client &client, const std::string &message) {
 
-    // Verificar si el cliente está autenticado antes de unirse a un canal
+    std::istringstream iss(message);
+    std::string channel_name, key;
+    iss >> channel_name;
+    iss >> channel_name;
+    iss >> key;
+
+    // Verificar autenticación
     if (!client.isAuthenticated()) {
-        const char* error_msg = "ERROR: You must authenticate before joining a channel.\r\n";
-        send(client.getFd(), error_msg, strlen(error_msg), 0);
-        std::cout << "[DEBUG] Unauthenticated client attempted to join " << channel_name << std::endl;
+        std::vector<std::string> params;
+        params.push_back(srv.getServerName());
+        params.push_back(client.getNickname());
+        std::string error = Reply::r_ERR_NOTREGISTERED(params);
+        send(client.getFd(), error.c_str(), error.size(), 0);
         return;
     }
 
-    // Verificar si el nombre del canal es válido
+    // Validar nombre del canal
     if (channel_name.empty() || channel_name[0] != '#') {
-        const char* error_msg = "ERROR: Invalid channel name. Must begin with '#'.\r\n";
-        send(client.getFd(), error_msg, strlen(error_msg), 0);
-        std::cout << "[DEBUG] Error: Invalid channel name -> " << channel_name << std::endl;
+        std::vector<std::string> params;
+        params.push_back(srv.getServerName());
+        params.push_back(client.getNickname());
+        params.push_back(channel_name);
+        std::string error = Reply::r_ERR_NOSUCHCHANNEL(params);
+        send(client.getFd(), error.c_str(), error.size(), 0);
         return;
     }
 
@@ -41,34 +50,61 @@ void CommandHandler::handleJoin(Server &srv, Client &client, const std::string &
     Channel* channel = srv.getChannelManager().getChannelByName(channel_name);
 
     if (!channel) {
-        std::cout << "[DEBUG] Channel " << channel_name << "not found, creating new channel." << std::endl;
+        // Crear nuevo canal y asignar operador
         srv.getChannelManager().addChannel(Channel(channel_name));
         channel = srv.getChannelManager().getChannelByName(channel_name);
-        // Al crear el canal, asignar al cliente como operador.
-        channel->setOperator(client, true);
-        std::cout << "[DEBUG] " << client.getNickname() << " assigned as operator in " << channel_name << std::endl;
+        channel->addClient(client);
+        channel->addOperator(client);
+    } else {
+        // Comprobar restricciones ANTES de añadir al usuario
+        if (channel->isInviteOnly() && !channel->isUserInvited(client)) {
+            std::vector<std::string> params;
+            params.push_back(srv.getServerName());
+            params.push_back(client.getNickname());
+            params.push_back(channel_name);
+            std::string error = Reply::r_ERR_INVITEONLYCHAN(params);
+            send(client.getFd(), error.c_str(), error.size(), 0);
+            return;
+        }
+        
+        if (!channel->getKey().empty() && key != channel->getKey()) {
+            std::vector<std::string> params;
+            params.push_back(srv.getServerName());
+            params.push_back(client.getNickname());
+            params.push_back(channel_name);
+            std::string error = Reply::r_ERR_BADCHANNELKEY(params);
+            send(client.getFd(), error.c_str(), error.size(), 0);
+            return;
+        }
+
+        if (channel->getUserLimit() > 0 && 
+            channel->getClients().size() >= static_cast<size_t>(channel->getUserLimit())) {
+            std::vector<std::string> params;
+            params.push_back(srv.getServerName());
+            params.push_back(client.getNickname());
+            params.push_back(channel_name);
+            std::string error = Reply::r_ERR_CHANNELISFULL(params);
+            send(client.getFd(), error.c_str(), error.size(), 0);
+            return;
+        }
+
+        // Añadir al usuario si pasa las comprobaciones
+        if (channel->isClientInChannel(client)) {
+            std::vector<std::string> params;
+            params.push_back(srv.getServerName());
+            params.push_back(client.getNickname());
+            params.push_back(channel_name);
+            std::string error = Reply::r_ERR_USERONCHANNEL(params);
+            send(client.getFd(), error.c_str(), error.size(), 0);
+            return;
+        }
+        channel->addClient(client);
     }
 
-    // Verificar si el cliente ya está en el canal
-    if (channel->isClientInChannel(client)) {
-        const char* error_msg = "ERROR: You are already on this channel.\r\n";
-        send(client.getFd(), error_msg, strlen(error_msg), 0);
-        std::cout << "[DEBUG] Client " << client.getNickname() << " It's already in " << channel_name << std::endl;
-        return;
-    }
-
-    // Agregar al cliente al canal
-    channel->addClient(client);
-    std::cout << "[DEBUG] Client " << client.getNickname() << " joined " << channel_name << std::endl;
-
-    // Notificar al canal que el cliente se unió
+    // Notificar unión al canal
     std::string join_msg = ":" + client.getFullIdentifier() + " JOIN " + channel_name + "\r\n";
     channel->broadcast(join_msg);
 
-    // Si el canal es solo por invitación, verificar la invitación
-    if (channel->isInviteOnly() && !channel->isUserInvited(client)) {
-        send(client.getFd(), "ERROR: This channel is by invitation only.\r\n", 40, 0);
-        return;
-    }
+    // Limpiar invitación si existía
     channel->removeInvitedUser(client);
 }

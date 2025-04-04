@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:27 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/04/02 17:26:51 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/03 19:45:54 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -173,4 +173,20 @@ void Channel::removeClient(const std::string& nickname) {
 
 bool Channel::isSecret() const {
     return false;
+}
+
+time_t Channel::getTopicTime() const {
+    return topicTime;
+}
+
+void Channel::setTopicTime(time_t time) {
+    topicTime = time;
+}
+
+std::string Channel::getTopicSetter() const {
+    return topicSetter;
+}
+
+void Channel::setTopicSetter(const std::string &setter) {
+    topicSetter = setter;
 }

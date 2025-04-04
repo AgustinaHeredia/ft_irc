@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/02 13:40:36 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/04/02 15:34:39 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/04 11:25:11 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,9 +48,6 @@ void CommandHandler::handlePart(Server &srv, Client &client, const std::string &
     // Notificar a todos los usuarios del canal (incluido el que sale)
     std::string part_msg = ":" + client.getFullIdentifier() + " PART " + channel_name + "\r\n";
     channel->broadcast(part_msg);
-
-    // También enviar el mensaje al cliente que sale (si no lo hace broadcast)
-    send(client.getFd(), part_msg.c_str(), part_msg.size(), 0);
 
     //  Remover al cliente del canal
     channel->removeClient(client);

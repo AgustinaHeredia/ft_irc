@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/30 18:54:48 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/04/03 15:56:06 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/03 20:00:09 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,5 +118,33 @@ namespace Reply {
     std::string r_RPL_UMODEIS(const std::vector<std::string> &av) {
         if (av.size() < 3) return ": 221 * :No user modes set\r\n";
         return ":" + av[0] + " 221 " + av[1] + " " + av[2] + "\r\n";
+    }
+    std::string r_ERR_INVITEONLYCHAN(const std::vector<std::string> &av) {
+        if (av.size() < 3) return ": 473 * * :Cannot join channel (+i)\r\n";
+        return ":" + av[0] + " 473 " + av[1] + " " + av[2] + " :Cannot join channel (+i)\r\n";
+    }
+
+    std::string r_ERR_BADCHANNELKEY(const std::vector<std::string> &av) {
+        if (av.size() < 3) return ": 475 * * :Cannot join channel (+k)\r\n";
+        return ":" + av[0] + " 475 " + av[1] + " " + av[2] + " :Cannot join channel (+k)\r\n";
+    }
+
+    std::string r_ERR_CHANNELISFULL(const std::vector<std::string> &av) {
+        if (av.size() < 3) return ": 471 * * :Cannot join channel (+l)\r\n";
+        return ":" + av[0] + " 471 " + av[1] + " " + av[2] + " :Cannot join channel (+l)\r\n";
+    }
+
+    std::string r_ERR_USERONCHANNEL(const std::vector<std::string> &av) {
+        if (av.size() < 3) return ": 443 * * :is already on channel\r\n";
+        return ":" + av[0] + " 443 " + av[1] + " " + av[2] + " :is already on channel\r\n";
+    }
+
+    std::string r_ERR_TOPICWHOTIME(const std::vector<std::string> &av) {
+        if (av.size() < 4) return ": 333 * * * :No topic setter/time\r\n";
+        return ":" + av[0] + " 333 " + av[1] + " " + av[2] + " " + av[3] + " " + av[4] + "\r\n";
+    }
+    std::string r_ERR_NOTONCHANNEL(const std::vector<std::string> &av) {
+        if (av.size() < 3) return ": 442 * * :You're not on that channel\r\n";
+        return ":" + av[0] + " 442 " + av[1] + " " + av[2] + " :You're not on that channel\r\n";
     }
 }

@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/09 00:05:34 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/04/02 15:09:02 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/03 19:59:15 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,63 +17,104 @@
 #include <sstream>
 #include <cstring>
 
+
+// Funciones auxiliares
+void sendCurrentTopic(Client &client, Channel &channel, const std::string &serverName) {
+    if (channel.getTopic().empty()) {
+        std::string msg = ":" + serverName + " 331 " + client.getNickname() + " " + channel.getName() + " :No topic is set\r\n";
+        send(client.getFd(), msg.c_str(), msg.size(), 0);
+    } else {
+        std::string topic_msg = ":" + serverName + " 332 " + client.getNickname() + " " + channel.getName() + " :" + channel.getTopic() + "\r\n";
+        send(client.getFd(), topic_msg.c_str(), topic_msg.size(), 0);
+        
+        std::ostringstream timestamp;
+        timestamp << channel.getTopicTime();
+        std::string who_msg = ":" + serverName + " 333 " + client.getNickname() + " " + channel.getName() + " " + channel.getTopicSetter() + " " + timestamp.str() + "\r\n";
+        send(client.getFd(), who_msg.c_str(), who_msg.size(), 0);
+    }
+}
+
+void broadcastTopicChange(Client &client, Channel &channel, const std::string &topic) {
+    std::string msg = ":" + client.getFullIdentifier() + " TOPIC " + channel.getName() + " :" + topic + "\r\n";
+    channel.broadcast(msg);
+    channel.setTopicTime(time(NULL));
+    channel.setTopicSetter(client.getNickname());
+}
+
 void CommandHandler::handleTopic(Server &srv, Client &client, const std::string &message) {
     std::istringstream iss(message);
     std::string channel_name, topic;
     iss >> channel_name;
-    std::getline(iss >> std::ws, topic); //  Captura el nuevo tema si existe
 
-    std::cout << "[DEBUG] TOPIC command received: " << message << std::endl;
-    std::cout << "[DEBUG] Channel: " << channel_name << ", New topic: " << topic << std::endl;
+    // 1. Extraer tema 
+    std::getline(iss >> std::ws, topic);
+    size_t colon_pos = topic.find(':');
+    if (colon_pos != std::string::npos) {
+        topic = topic.substr(colon_pos + 1);
+    }
+    topic.erase(0, topic.find_first_not_of(" \t"));
+    topic.erase(topic.find_last_not_of(" \t") + 1);
 
-	if (!client.isAuthenticated()) {
-        const char* error_msg = "Warning: Authentication is missing.\r\n";
-        send(client.getFd(), error_msg, strlen(error_msg), 0);
-		std::cout << "[DEBUG] Unauthenticated client attempted TOPIC " << std::endl;
+    // 2. Verificación de autenticación
+    if (!client.isAuthenticated()) {
+        std::vector<std::string> params;
+        params.push_back(srv.getServerName());
+        params.push_back(client.getNickname());
+        std::string error = Reply::r_ERR_NOTREGISTERED(params);
+        send(client.getFd(), error.c_str(), error.size(), 0);
         return;
     }
 
-    //  Verificar si el canal es válido
+    // 3. Validación del nombre del canal
     if (channel_name.empty() || channel_name[0] != '#') {
-		const char* error_msg = "ERROR: Invalid channel name. Must begin with '#'.\r\n";
-        send(client.getFd(), error_msg, strlen(error_msg), 0);
+        std::vector<std::string> params;
+        params.push_back(srv.getServerName());
+        params.push_back(client.getNickname());
+        params.push_back(channel_name);
+        std::string error = Reply::r_ERR_NOSUCHCHANNEL(params);
+        send(client.getFd(), error.c_str(), error.size(), 0);
         return;
     }
 
-    //  Buscar el canal
+    // 4. Obtener canal
     Channel* channel = srv.getChannelManager().getChannelByName(channel_name);
-    std::cout << "[DEBUG] Received KICK: " << message << std::endl;
-	if (!channel) {
-        const char* error_msg = "ERROR: Channel not found.\r\n";
-        send(client.getFd(), error_msg, strlen(error_msg), 0);
-		return;
-    }
-
-    //  Si no se especifica un nuevo tema, devolver el tema actual
-    if (topic.empty()) {
-        std::string topic_msg = "TOPIC " + channel_name + " " + channel->getTopic() + "\r\n";
-        send(client.getFd(), topic_msg.c_str(), topic_msg.size(), 0);
+    if (!channel) {
+        std::vector<std::string> params;
+        params.push_back(srv.getServerName());
+        params.push_back(client.getNickname());
+        params.push_back(channel_name);
+        std::string error = Reply::r_ERR_NOSUCHCHANNEL(params);
+        send(client.getFd(), error.c_str(), error.size(), 0);
         return;
     }
 
-    //  Verificar si el cliente está en el canal
+    // 5. Comando sin tema: enviar tema actual
+    if (topic.empty()) {
+        sendCurrentTopic(client, *channel, srv.getServerName());
+        return;
+    }
+
+    // 6. Verificar membresía en el canal
     if (!channel->isClientInChannel(client)) {
-        const char* error_msg = "ERROR: You are not on this channel.\r\n";
-        send(client.getFd(), error_msg, strlen(error_msg), 0);
-		return;
+        std::vector<std::string> params;
+        params.push_back(srv.getServerName());
+        params.push_back(channel_name);
+        std::string error = Reply::r_ERR_NOTONCHANNEL(params);
+        send(client.getFd(), error.c_str(), error.size(), 0);
+        return;
     }
 
-    //  Verificar si el cliente es operador
-    if (!channel->isOperator(client)) {
-        const char* error_msg = "ERROR: You do not have permission to change the theme.\r\n";
-        send(client.getFd(), error_msg, strlen(error_msg), 0);
-		return;
+    // 7. Validar permisos (modo +t y operador)
+    if (channel->isTopicRestricted() && !channel->isOperator(client)) {
+        std::vector<std::string> params;
+        params.push_back(srv.getServerName());
+        params.push_back(channel_name);
+        std::string error = Reply::r_ERR_CHANOPRIVSNEEDED(params);
+        send(client.getFd(), error.c_str(), error.size(), 0);
+        return;
     }
 
-    //  Cambiar el tema del canal
+    // 8. Actualizar y notificar
     channel->setTopic(topic);
-
-    //  Notificar a todos en el canal sobre el cambio
-    std::string topic_change_msg = ":" + client.getNickname() + " TOPIC " + channel_name + " " + topic + "\r\n";
-    channel->broadcast(topic_change_msg);
+    broadcastTopicChange(client, *channel, topic);
 }

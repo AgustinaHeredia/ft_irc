@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:14 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/04/02 14:39:10 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/04 11:10:25 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ void CommandHandler::handleCommand(Client& client, const std::string& command) {
         handlePrivmsg(server, client, message);
     } else if (cmd == "JOIN") {
         std::string channel_name;
-        iss >> channel_name;
+        channel_name = iss.str();
         handleJoin(server, client, channel_name);
     } else if (cmd == "PART") {
         std::string channel_name;
