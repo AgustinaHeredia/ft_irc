@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:07:11 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/04/02 13:10:46 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/04 11:33:25 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -346,10 +346,20 @@ void Server::handlePassword(Client& client, const std::string& pass) {
 }
 
 void Server::disconnectClient(Client& client, const std::string& reason) {
+
     std::string msg = "ERROR :" + reason + "\r\n";
     send(client.getFd(), msg.c_str(), msg.size(), 0);
+    client.setZombie(true);
     close(client.getFd());
+
+    for (size_t i = 0; i < fds.size(); ++i) {
+        if (fds[i].fd == client.getFd()) {
+            fds.erase(fds.begin() + i);
+            break;
+        }
+    }
     clientManager.removeClient(&client);
+    std::cout << "🔌 Client disconnected (fd: " << client.getFd() << "). Reason: " << reason << std::endl;
 }
 
 ClientManager &Server::getClientManager() {
