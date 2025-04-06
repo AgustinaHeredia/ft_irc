@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:09 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/04/03 19:56:47 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/06 11:24:02 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,8 +47,6 @@ class CommandHandler {
 		void handleWho(Server &srv, Client &client, const std::string& message);
 		void handleNotice(Server &srv, Client &client, const std::string &message);
 		void handleBot(Client &client, const std::string &message);
-		void handleDccSend(Server& srv, Client& sender, const std::string& msg);
-		void handleDccAccept(Server& srv, Client& receiver, const std::string& msg);
 		
 		std::vector<std::string> split(const std::string &s, char delimiter);
 		std::string trim(const std::string &str);

@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/02 13:39:53 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/04/06 09:40:33 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/06 10:55:22 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,6 @@
 #include <vector>
 
 void CommandHandler::handlePrivmsg(Server &srv, Client &client, const std::string &message) {
-    std::cout << "here!" << std::endl;
     std::istringstream iss(message);
     std::string target, msg;
 

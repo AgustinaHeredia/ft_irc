@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:14 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/04/06 09:43:54 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/06 11:23:40 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,16 +109,6 @@ void CommandHandler::handleCommand(Client& client, const std::string& command) {
         std::string message;
         std::getline(iss, message);
         handleBot(client, message);
-    } else if (cmd == "DCC") {
-        std::string message;
-        std::getline(iss, message);
-        if (message.find("SEND") != std::string::npos) {
-            handleDccSend(server, client, message);
-        } else if (message.find("ACCEPT") != std::string::npos) {
-            handleDccAccept(server, client, message);
-        } else {
-            send(client.getFd(), "ERROR: Unknown DCC command.\r\n", 30, 0);
-        }
     } else if (cmd == "CAP") {
         // Ignoramos cualquier comando CAP que llegue desde el cliente
         std::string cap_response = server.getServerName() + " CAP * LS :\r\n"; // Lista vacía

@@ -26,7 +26,6 @@ SRC = $(SRC_DIR)/main.cpp \
 	$(SRC_DIR)/commands/WHO.cpp \
 	$(SRC_DIR)/commands/NOTICE.cpp \
 	$(SRC_DIR)/commands/BOT.cpp \
-	$(SRC_DIR)/commands/DCC.cpp \
 	$(INC_DIR)/utils.cpp 
 
 
