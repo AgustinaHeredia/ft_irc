@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/02 13:40:26 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/04/01 16:32:03 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/06 10:26:51 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 #include <ctime> // time
 #include <sstream>
 #include <algorithm>
+#include <iomanip>
 
 void CommandHandler::handleBot(Client &client, const std::string &message) 
 {
@@ -31,9 +32,11 @@ void CommandHandler::handleBot(Client &client, const std::string &message)
     if (message.empty()) 
     {
         const char* menu = 
-            "Bot Options:\r\n"
-            " - !bot rps <rock|paper|scissors> : Play Rock, Paper, Scissors.\r\n"
-            " - !bot coinflip : Flip a coin (heads or tails).\r\n";
+            "BOT COMMANDS:\r\n"
+            " - !bot commands : Show all the posible commands\r\n"
+            " - !bot time : Show server time\r\n"
+            " - !bot coinflip : Flip a coin\r\n"
+            " - !bot rps <rock|paper|scissors> : Play Rock-Paper-Scissors\r\n";
         send(client.getFd(), menu, strlen(menu), 0);
         return;
     }
@@ -91,7 +94,40 @@ void CommandHandler::handleBot(Client &client, const std::string &message)
         std::string result = (rand() % 2 == 0) ? "It came up heads!" : "It came up tails!";
         std::string response = "Bot: " + result + "\r\n";
         send(client.getFd(), response.c_str(), response.length(), 0);
-    } 
+    }
+    else if (subcommand == "time") 
+    {
+        time_t rawtime;
+        struct tm* timeinfo;
+        char buffer[80];
+
+        time(&rawtime);
+        timeinfo = localtime(&rawtime);
+        strftime(buffer, sizeof(buffer), "[%Y-%m-%d] %H:%M:%S UTC", timeinfo);
+        
+        std::string response = "Server time: ";
+        response += buffer;
+        response += "\r\n";
+        send(client.getFd(), response.c_str(), response.size(), 0);
+    }
+    else if (subcommand == "commands") {
+        const char* menu1 =
+            "IRC COMMANDS:\r\n"
+            " - NICK <newnick>               : Change your nickname.\r\n"
+            " - USER <username> <hostname> <server> <realname> : Set your user info.\r\n"
+            " - QUIT [reason]                : Disconnect from the server.\r\n"
+            " - PRIVMSG <target> : <message>  : Send a private or channel message.\r\n"
+            " - NOTICE <target> : <message>   : Send a notice.\r\n"
+            " - JOIN <#channel>              : Join a channel.\r\n"
+            " - PART <#channel>              : Leave a channel.\r\n"
+            " - KICK <#channel> <user> [reason] : Kick a user from a channel.\r\n"
+            " - TOPIC <#channel> [new topic] : Set or view the channel topic.\r\n"
+            " - MODE <target> <modes> [params] : Change modes for channels/users.\r\n"
+            " - INVITE <user> <#channel>     : Invite a user to a channel.\r\n"
+            " - WHO [#channel]             : List users on the server or in a channel.\r\n"
+            " - !BOT <subcommand>          : Bot commands (time, coinflip, rps).\r\n";
+        send(client.getFd(), menu1, strlen(menu1), 0);
+    }
     // Subcomando no reconocido
     else
     {
