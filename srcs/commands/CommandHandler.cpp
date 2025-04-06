@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 19:12:14 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/04/04 11:10:25 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/06 09:43:54 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,7 +104,7 @@ void CommandHandler::handleCommand(Client& client, const std::string& command) {
     } else if (cmd == "NOTICE") {
         std::string message;
         std::getline(iss, message);
-        handlePrivmsg(server, client, message);
+        handleNotice(server, client, message);
     } else if (cmd == "!BOT") {
         std::string message;
         std::getline(iss, message);

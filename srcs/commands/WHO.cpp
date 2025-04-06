@@ -6,7 +6,7 @@
 /*   By: pquintan <pquintan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/09 21:26:06 by agusheredia       #+#    #+#             */
-/*   Updated: 2025/04/04 12:05:24 by pquintan         ###   ########.fr       */
+/*   Updated: 2025/04/06 09:11:03 by pquintan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,15 +34,20 @@ void CommandHandler::handleWho(Server& srv, Client& client, const std::string& m
 
     //  WHO sin canal → Listar todos los usuarios del servidor
     if (channel_name.empty()) { 
-        std::string response = "Connected users:\r\n";
         std::vector<Client*> clients = srv.getClientManager().getAllClients();
         for (size_t i = 0; i < clients.size(); ++i) {
-            // Añadir condición !clients[i]->isInvisible()
             if (clients[i]->isConnected() && !clients[i]->isInvisible()) {
-                response += clients[i]->getNickname() + "\r\n";
+                // Formato estándar: :<servidor> 352 <usuario> * <username> <host> <servidor> <nick> H :0 <realname>
+                std::string reply = ":" + srv.getServerName() + " 352 " + client.getNickname() + " * " 
+                    + clients[i]->getUsername() + " " + clients[i]->getHostname() + " " 
+                    + srv.getServerName() + " " + clients[i]->getNickname() + " H :0 " 
+                    + clients[i]->getRealname() + "\r\n";
+                send(client.getFd(), reply.c_str(), reply.size(), 0);
             }
         }
-        send(client.getFd(), response.c_str(), response.size(), 0);
+        // Fin de la lista
+        std::string endReply = ":" + srv.getServerName() + " 315 " + client.getNickname() + " * :End of WHO list\r\n";
+        send(client.getFd(), endReply.c_str(), endReply.size(), 0);
         return;
     }
 
